@@ -933,6 +933,20 @@ export class InputManager {
             }
 
             this._initClickEvent(scene.onPrePointerObservable, scene.onPointerObservable, evt, (clickInfo: _ClickInfo, pickResult: Nullable<PickingInfo>) => {
+                // There should be a pointer captured at this point so if there isn't we should reset and return
+                if (!this._pointerCaptures[evt.pointerId]) {
+                    if (this._swipeButtonPressed === evt.button) {
+                        this._isSwiping = false;
+                        this._swipeButtonPressed = -1;
+                    }
+                    return;
+                }
+
+                // Only release capture if all buttons are released
+                if (evt.buttons === 0) {
+                    this._pointerCaptures[evt.pointerId] = false;
+                }
+
                 // PreObservable support
                 if (scene.onPrePointerObservable.hasObservers()) {
                     this._skipPointerTap = false;
@@ -966,19 +980,6 @@ export class InputManager {
                     }
                 }
 
-                // There should be a pointer captured at this point so if there isn't we should reset and return
-                if (!this._pointerCaptures[evt.pointerId]) {
-                    if (this._swipeButtonPressed === evt.button) {
-                        this._isSwiping = false;
-                        this._swipeButtonPressed = -1;
-                    }
-                    return;
-                }
-
-                // Only release capture if all buttons are released
-                if (evt.buttons === 0) {
-                    this._pointerCaptures[evt.pointerId] = false;
-                }
                 if (!scene.cameraToUseForPointers && !scene.activeCamera) {
                     return;
                 }
