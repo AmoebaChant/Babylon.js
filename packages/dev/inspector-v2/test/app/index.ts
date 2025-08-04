@@ -18,6 +18,8 @@ import { ShowInspector } from "../../src/inspector";
 import { StandardMaterial } from "core/Materials/standardMaterial";
 import { MeshBuilder } from "core/Meshes";
 import { PBRMaterial } from "core/Materials/PBR/pbrMaterial";
+import { StandardMaterial } from "core/Materials/standardMaterial";
+import { MeshBuilder } from "core/Meshes";
 
 // Register scene loader plugins.
 registerBuiltInLoaders();
@@ -42,6 +44,8 @@ function createCamera() {
     camera?.dispose();
     scene.createDefaultCameraOrLight(true, true, true);
     camera = scene.activeCamera as ArcRotateCamera;
+    camera.alpha = 1.8;
+    camera.beta = 1.3;
     camera.alpha = 1.8;
     camera.beta = 1.3;
 }
@@ -104,6 +108,8 @@ function createTestPBRSphere() {
 
     createTestBoxes();
     createTestPBRSphere();
+
+    createTestBoxes();
 
     engine.runRenderLoop(() => {
         scene.render();
