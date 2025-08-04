@@ -17,6 +17,7 @@ import { ArcRotateCamera } from "core/Cameras/arcRotateCamera";
 import { ShowInspector } from "../../src/inspector";
 import { StandardMaterial } from "core/Materials/standardMaterial";
 import { MeshBuilder } from "core/Meshes";
+import { PBRMaterial } from "core/Materials/PBR/pbrMaterial";
 
 // Register scene loader plugins.
 registerBuiltInLoaders();
@@ -75,6 +76,24 @@ function createTestBoxes() {
     boxInstance.position = new Vector3(0, 0, -0.5);
 }
 
+function createTestPBRSphere() {
+    const sphere = MeshBuilder.CreateSphere("pbrSphere", { diameter: 0.15 }, scene);
+    sphere.position.x = -0.15;
+
+    const glass = new PBRMaterial("glass", scene);
+    glass.indexOfRefraction = 0.52;
+    glass.alpha = 0.5;
+    glass.directIntensity = 0.0;
+    glass.environmentIntensity = 0.7;
+    glass.cameraExposure = 0.66;
+    glass.cameraContrast = 1.66;
+    glass.microSurface = 1;
+    glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
+    glass.albedoColor = new Color3(0.95, 0.95, 0.95);
+
+    sphere.material = glass;
+}
+
 (async () => {
     let assetContainer = await LoadAssetContainerAsync("https://assets.babylonjs.com/meshes/Demos/optimized/acrobaticPlane_variants.glb", scene);
     assetContainer.addAllToScene();
@@ -84,6 +103,7 @@ function createTestBoxes() {
     await createPhysics();
 
     createTestBoxes();
+    createTestPBRSphere();
 
     engine.runRenderLoop(() => {
         scene.render();

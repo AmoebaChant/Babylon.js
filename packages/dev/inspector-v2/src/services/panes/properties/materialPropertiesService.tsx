@@ -9,6 +9,8 @@ import { Material } from "core/Materials/material";
 import { MaterialTransparencyProperties } from "../../../components/properties/materials/materialProperties";
 import { StandardMaterial } from "core/Materials/standardMaterial";
 import { StandardMaterialLightingAndColorProperties } from "../../../components/properties/materials/standardMaterialLightingAndColorProperties";
+import { PBRMaterial } from "core/Materials/PBR/pbrMaterial";
+import { PBRMaterialLightingAndColorProperties } from "../../../components/properties/materials/pbrMaterialLightingAndColorProperties";
 
 export const MaterialPropertiesServiceDefinition: ServiceDefinition<[], [IPropertiesService, ISelectionService]> = {
     friendlyName: "Material Properties",
@@ -36,10 +38,22 @@ export const MaterialPropertiesServiceDefinition: ServiceDefinition<[], [IProper
             ],
         });
 
+        const pbrMaterialContentRegistration = propertiesService.addSectionContent({
+            key: "PBR Material Properties",
+            predicate: (entity: unknown) => entity instanceof PBRMaterial,
+            content: [
+                {
+                    section: "Lighting & Colors",
+                    component: ({ context }) => <PBRMaterialLightingAndColorProperties pbrMaterial={context} />,
+                },
+            ],
+        });
+
         return {
             dispose: () => {
                 materialContentRegistration.dispose();
                 standardMaterialContentRegistration.dispose();
+                pbrMaterialContentRegistration.dispose();
             },
         };
     },
