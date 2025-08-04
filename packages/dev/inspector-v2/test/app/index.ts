@@ -46,8 +46,6 @@ function createCamera() {
     camera = scene.activeCamera as ArcRotateCamera;
     camera.alpha = 1.8;
     camera.beta = 1.3;
-    camera.alpha = 1.8;
-    camera.beta = 1.3;
 }
 
 function createPostProcess() {
@@ -108,8 +106,6 @@ function createTestPBRSphere() {
 
     createTestBoxes();
     createTestPBRSphere();
-
-    createTestBoxes();
 
     engine.runRenderLoop(() => {
         scene.render();
