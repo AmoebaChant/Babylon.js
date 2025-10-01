@@ -34,6 +34,7 @@
     ],
     "scripts": {
         "build": "npm run clean && npm run compile",
+        "build:trimmed:core": "npm run build:trimmed -w @dev/core -- --trimConfig ./potato.json",
         "clean": "rimraf dist && rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
         "compile": "tsc -b tsconfig.build.json",
         "postcompile": "build-tools -c add-js-to-es6"
