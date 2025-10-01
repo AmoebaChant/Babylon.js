@@ -56,6 +56,16 @@ export const transformPackageLocation = (location: string, options: ITransformer
         return AddJS(location, options.appendJS);
     }
 
+    // Check for translation overrides first
+    if (options.translationOverrides && options.translationOverrides[basePackage]) {
+        const overridePackage = options.translationOverrides[basePackage];
+        if (directoryParts.length === 0) {
+            // Do not add .js to imports that reference the root of a package
+            return overridePackage;
+        }
+        return AddJS(options.packageOnly ? overridePackage : `${overridePackage}/${directoryParts.join("/")}`, options.appendJS);
+    }
+
     const returnPackageVariable: PublicPackageVariable = getDevPackagesByBuildType(options.buildType)[basePackage];
     const returnPackage = getPublicPackageName(returnPackageVariable);
     // not found? probably an external library. return the same location
@@ -106,6 +116,13 @@ interface ITransformerOptions {
     appendJS?: boolean | string;
 
     keepDev?: boolean;
+
+    /**
+     * Map of source locations to override locations. If a match is found,
+     * the override location will be used instead of the default package transformation.
+     * Example: { "core": "lib/core" } would transform "core/bar" to "lib/core/bar"
+     */
+    translationOverrides?: { [key: string]: string };
 }
 
 // inspired by https://github.com/OniVe/ts-transform-paths

@@ -16,16 +16,25 @@
                 "after": true,
                 "buildType": "es6",
                 "basePackage": "@babylonjs/lottie-player",
-                "appendJS": true
+                "appendJS": true,
+                "translationOverrides": {
+                    "core": "/lib/@babylonjs/core"
+                }
             },
             {
                 "transform": "@dev/build-tools/dist/pathTransform.js",
                 "afterDeclarations": true,
                 "buildType": "es6",
                 "basePackage": "@babylonjs/lottie-player",
-                "appendJS": true
+                "appendJS": true,
+                "translationOverrides": {
+                    "core": "/lib/@babylonjs/core"
+                }
             }
-        ]
+        ],
+        "paths": {
+            "core/*": ["public/@babylonjs/lottiePlayer/lib/@babylonjs/core/*"]
+        }
     },
 
     "include": ["../../../dev/lottiePlayer/src/**/*"]

@@ -18,6 +18,9 @@ function LoadConfig(configPath: string) {
         );
     }
 
+    // Ensure we write to a separate directory to avoid having this output confused with the non-trimmed output
+    configFile.config.compilerOptions.outDir = "./trimmedDist";
+
     const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, path.dirname(configPath));
 
     return parsed;

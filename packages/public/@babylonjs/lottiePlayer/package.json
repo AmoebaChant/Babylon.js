@@ -33,9 +33,10 @@
         "license.md"
     ],
     "scripts": {
-        "build": "npm run clean && npm run compile",
+        "build": "npm run clean && npm run copy && npm run compile",
         "build:trimmed:core": "npm run build:trimmed -w @dev/core -- --trimConfig ./potato.json",
-        "clean": "rimraf dist && rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
+        "clean": "rimraf lib && rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
+        "copy": "node -e \"require('fs').cpSync('../../../dev/core/trimmedDist', './lib/@babylonjs/core', { recursive: true })\"",
         "compile": "tsc -b tsconfig.build.json",
         "postcompile": "build-tools -c add-js-to-es6"
     },
