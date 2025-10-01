@@ -49,7 +49,7 @@ function Compile(configPath: string, trimTransformer: ts.TransformerFactory<ts.S
 /**
  * Build the project using the provided tsconfig.json and trim unused code based on the trimConfig.json.
  */
-export function buildAndTrim() {
+export function BuildAndTrim() {
     const tsConfigPath = checkArgs("--tsConfig");
     const trimConfigPath = checkArgs("--trimConfig");
 
