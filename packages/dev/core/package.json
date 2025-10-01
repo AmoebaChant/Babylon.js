@@ -12,6 +12,7 @@
     ],
     "scripts": {
         "build": "npm run clean && npm run compile",
+        "build:trimmed": "npm run clean && npm run precompile && build-tools -c build-and-trim --tsConfig tsconfig.build.json",
         "test": "jest -c ../../../jest.config.ts",
         "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
         "lint": "npm run lint:check",

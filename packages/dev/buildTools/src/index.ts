@@ -11,6 +11,7 @@ import { prepareSnapshot } from "./prepareSnapshot.js";
 import { umdPackageMapping } from "./packageMapping.js";
 import { updateEngineVersion } from "./updateEngineVersion.js";
 import { declarationsEs6 } from "./declarationsEs6.js";
+import { buildAndTrim } from "./buildAndTrim.js";
 // public API
 import transformer from "./pathTransform.js";
 import * as webpackTools from "./webpackTools.js";
@@ -63,6 +64,9 @@ function RunCommand(command: string) {
             case "bs":
                 processAssets({ extensions: ["fx"] });
                 break;
+            case "build-and-trim":
+            case "bt":
+                buildAndTrim();
             case "transform-lts":
             case "tlts":
                 transformLtsCommand();
