@@ -32,6 +32,7 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
 
             const visitor = (node: ts.Node): ts.Node | undefined => {
                 let pushedOntoStack: boolean = false;
+                let shouldVisitChildren: boolean = false;
 
                 if (ts.isClassDeclaration(node)) {
                     const name = node.name?.escapedText;
@@ -45,6 +46,7 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
                             }
                             stackOfNames.push(name.toString());
                             pushedOntoStack = true;
+                            shouldVisitChildren = true;
                         } else {
                             // This class doesn't exist in the configuration data, don't bother visiting its children
                             if (verbose) {
@@ -53,19 +55,20 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
                             return node;
                         }
                     }
-                }
-
-                if (ts.isMethodDeclaration(node)) {
+                } else if (ts.isMethodDeclaration(node)) {
                     const name = node.name;
                     if (ts.isIdentifier(name)) {
                         if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
                             console.log("Removing method:", [...stackOfNames, name.escapedText.toString()].join("."));
                             return undefined;
                         }
+                        shouldVisitChildren = true;
                     }
                 }
 
-                const toReturn = ts.visitEachChild(node, visitor, context);
+                // Either visit the children or return this node as-is
+                const toReturn = shouldVisitChildren ? ts.visitEachChild(node, visitor, context) : node;
+
                 if (verbose && ts.isClassDeclaration(node)) {
                     console.log("Done visiting class:", node.name?.escapedText);
                 }
