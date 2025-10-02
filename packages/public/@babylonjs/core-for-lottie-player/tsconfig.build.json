@@ -3,19 +3,16 @@
 
     "compilerOptions": {
         "outDir": "./",
-        "rootDir": "../../../dev/lottiePlayer/src",
+        "rootDir": "../../../dev/core/src",
         "declaration": true,
         "target": "ES2020",
         "importHelpers": true,
-        "sourceMap": true,
-        "declarationMap": true,
-        "inlineSources": false,
         "plugins": [
             {
                 "transform": "@dev/build-tools/dist/pathTransform.js",
                 "after": true,
                 "buildType": "es6",
-                "basePackage": "@babylonjs/lottie-player",
+                "basePackage": "@babylonjs/core",
                 "appendJS": true,
                 "translationOverrides": {
                     "core": "@babylonjs/core-for-lottie-player"
@@ -25,7 +22,7 @@
                 "transform": "@dev/build-tools/dist/pathTransform.js",
                 "afterDeclarations": true,
                 "buildType": "es6",
-                "basePackage": "@babylonjs/lottie-player",
+                "basePackage": "@babylonjs/core",
                 "appendJS": true,
                 "translationOverrides": {
                     "core": "@babylonjs/core-for-lottie-player"
@@ -33,9 +30,10 @@
             }
         ],
         "paths": {
-            "core/*": ["public/@babylonjs/core-for-lottie-player/*"]
+            "core/*": ["dev/core/src/*"],
+            "@lts/core/*": ["lts/core/src/*"]
         }
     },
 
-    "include": ["../../../dev/lottiePlayer/src/**/*"]
+    "include": ["../../../dev/core/src/**/*"]
 }

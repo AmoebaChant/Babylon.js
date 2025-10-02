@@ -50,4 +50,4 @@ packages/tools/smartFiltersEditor/www/scripts/**
 packages/tools/smartFiltersEditor/www/index.html
 
 # Lottie
-packages/public/@babylonjs/lottiePlayer/lib
+packages/public/@babylonjs/lottiePlayer/vendor

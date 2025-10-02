@@ -33,10 +33,8 @@
         "license.md"
     ],
     "scripts": {
-        "build": "npm run clean && npm run copy && npm run compile",
-        "build:trimmed:core": "npm run build:trimmed -w @dev/core -- --trimConfig ./potato.json",
-        "clean": "rimraf lib && rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
-        "copy": "node -e \"require('fs').cpSync('../../../dev/core/trimmedDist', './lib/@babylonjs/core', { recursive: true })\"",
+        "build": "npm run clean && npm run compile",
+        "clean": "rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
         "compile": "tsc -b tsconfig.build.json",
         "postcompile": "build-tools -c add-js-to-es6"
     },
@@ -46,5 +44,8 @@
     },
     "peerDependencies": {
         "@babylonjs/core": "^7.47.3 || ^8.0.1"
+    },
+    "dependencies": {
+        "@babylonjs/core-for-lottie-player": "file:vendor/babylonjs-core-for-lottie-player-8.29.1.tgz"
     }
 }
