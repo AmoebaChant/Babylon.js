@@ -17,3 +17,4 @@ node_modules
 !node-particle-editor/**/*.*
 !gui-editor/**/*.*
 !accessibility/**/*.*
+!lottiePlayer/build/**/*.*

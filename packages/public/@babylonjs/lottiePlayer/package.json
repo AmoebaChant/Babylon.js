@@ -30,7 +30,8 @@
         "**/*.d.ts",
         "**/*.map",
         "readme.md",
-        "license.md"
+        "license.md",
+        "!build/**"
     ],
     "scripts": {
         "build": "npm run clean && npm run consume:custom:core && npm run compile",
@@ -38,7 +39,7 @@
         "consume:custom:core": "rimraf vendor && mkdir vendor && cd vendor && npm pack -w @babylonjs/core-for-lottie-player",
         "compile": "tsc -b tsconfig.build.json",
         "postcompile": "build-tools -c add-js-to-es6",
-        "TODO": "TODO: before publishing to NPM, add a dependency from @babylonjs/core-for-lottie-player to file:vendor/babylonjs-core-for-lottie-player-1.0.0.tgz"
+        "prepublishOnly": "node ./build/addDependency.cjs"
     },
     "devDependencies": {
         "@dev/build-tools": "^1.0.0",
