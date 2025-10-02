@@ -1,6 +1,6 @@
 {
     "name": "@babylonjs/core-for-lottie-player",
-    "version": "8.29.1",
+    "version": "1.0.0",
     "main": "index.js",
     "module": "index.js",
     "types": "index.d.ts",

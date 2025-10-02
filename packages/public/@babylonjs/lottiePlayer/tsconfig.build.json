@@ -33,7 +33,7 @@
             }
         ],
         "paths": {
-            "core/*": ["public/@babylonjs/core-for-lottie-player/*"]
+            "core/*": ["dev/core-for-lottie-player/*"]
         }
     },
 

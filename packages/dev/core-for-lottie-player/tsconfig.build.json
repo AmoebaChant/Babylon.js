@@ -1,9 +1,9 @@
 {
-    "extends": "../../../../tsconfig.build.json",
+    "extends": "../../../tsconfig.build.json",
 
     "compilerOptions": {
         "outDir": "./",
-        "rootDir": "../../../dev/core/src",
+        "rootDir": "../core/src",
         "declaration": true,
         "target": "ES2020",
         "importHelpers": true,
@@ -30,10 +30,9 @@
             }
         ],
         "paths": {
-            "core/*": ["dev/core/src/*"],
-            "@lts/core/*": ["lts/core/src/*"]
+            "core/*": ["dev/core/src/*"]
         }
     },
 
-    "include": ["../../../dev/core/src/**/*"]
+    "include": ["../core/src/**/*"]
 }
