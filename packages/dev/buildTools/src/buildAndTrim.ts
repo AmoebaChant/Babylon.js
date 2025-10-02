@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import * as ts from "typescript";
 import * as path from "path";
-import { GetTrimTransformer } from "./trim.plugin";
+import { GetTrimTransformerFactory } from "./trim.plugin";
 import { checkArgs } from "./utils";
 
 // Load tsconfig.json
@@ -74,7 +74,7 @@ export function BuildAndTrim() {
         process.exit(1);
     }
 
-    const trimTransformer = GetTrimTransformer(trimConfigPath);
+    const trimTransformer = GetTrimTransformerFactory(trimConfigPath, !!checkArgs("--verbose"));
 
     Compile(tsConfigPath, trimTransformer);
 }
