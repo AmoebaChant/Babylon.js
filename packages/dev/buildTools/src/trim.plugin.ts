@@ -22,7 +22,7 @@ export function GetTrimTransformer(_configFile: string) {
                 }
 
                 if (ts.isIdentifier(node)) {
-                    console.log("Visiting identifier:", node.escapedText);
+                    // console.log("Visiting identifier:", node.escapedText);
                 }
 
                 return ts.visitEachChild(node, visitor, context);

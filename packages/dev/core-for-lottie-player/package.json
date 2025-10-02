@@ -16,9 +16,9 @@
     ],
     "scripts": {
         "build": "npm run clean && npm run compile",
-        "build:trimmed": "npm run build:trimmed -w @dev/core -- --trimConfig ./potato.json",
+        "precompile": "npm run precompile -w @dev/core",
         "clean": "rimraf dist && rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
-        "compile": "tsc -b tsconfig.build.json"
+        "compile": "build-tools -c build-and-trim --tsConfig tsconfig.build.json -- --trimConfig ./buildTrimConfig.json"
     },
     "devDependencies": {
         "@dev/build-tools": "^1.0.0",

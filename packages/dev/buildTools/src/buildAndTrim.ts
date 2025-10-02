@@ -6,11 +6,13 @@ import { GetTrimTransformer } from "./trim.plugin";
 import { checkArgs } from "./utils";
 
 // Load tsconfig.json
-function LoadConfig(configPath: string) {
-    const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
-    if (configFile.error) {
+function LoadConfig(configFileName: string) {
+    const configFileContents = ts.readConfigFile(configFileName, ts.sys.readFile);
+    const pathToConfigFile = path.dirname(path.resolve(configFileName));
+
+    if (configFileContents.error) {
         throw new Error(
-            ts.formatDiagnosticsWithColorAndContext([configFile.error], {
+            ts.formatDiagnosticsWithColorAndContext([configFileContents.error], {
                 getCurrentDirectory: ts.sys.getCurrentDirectory,
                 getCanonicalFileName: (f) => f,
                 getNewLine: () => ts.sys.newLine,
@@ -18,10 +20,7 @@ function LoadConfig(configPath: string) {
         );
     }
 
-    // Ensure we write to a separate directory to avoid having this output confused with the non-trimmed output
-    configFile.config.compilerOptions.outDir = "./trimmedDist";
-
-    const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, path.dirname(configPath));
+    const parsed = ts.parseJsonConfigFileContent(configFileContents.config, ts.sys, pathToConfigFile);
 
     return parsed;
 }
@@ -29,6 +28,14 @@ function LoadConfig(configPath: string) {
 // Compile and emit JS
 function Compile(configPath: string, trimTransformer: ts.TransformerFactory<ts.SourceFile>) {
     const parsedConfig = LoadConfig(configPath);
+
+    if (parsedConfig.errors.length > 0) {
+        for (const error of parsedConfig.errors) {
+            console.error(error.messageText);
+        }
+        return;
+    }
+
     const program = ts.createProgram(parsedConfig.fileNames, parsedConfig.options);
 
     const emitResult = program.emit(undefined, undefined, undefined, undefined, {
@@ -45,7 +52,7 @@ function Compile(configPath: string, trimTransformer: ts.TransformerFactory<ts.S
             })
         );
     } else {
-        console.log("✅ Build with plugin complete!");
+        console.log("Trimmed build complete!");
     }
 }
 
@@ -58,17 +65,14 @@ export function BuildAndTrim() {
 
     // Verify that both files exist
     if (typeof tsConfigPath !== "string" || !ts.sys.fileExists(tsConfigPath)) {
-        console.error(`❌ Error: tsconfig.json file not found at: ${tsConfigPath}`);
+        console.error(`tsconfig.json file not found at: ${tsConfigPath}`);
         process.exit(1);
     }
 
     if (typeof trimConfigPath !== "string" || !ts.sys.fileExists(trimConfigPath)) {
-        console.error(`❌ Error: trimConfig.json file not found at: ${trimConfigPath}`);
+        console.error(`trimConfig.json file not found at: ${trimConfigPath}`);
         process.exit(1);
     }
-
-    console.log(`📖 Using tsconfig: ${tsConfigPath}`);
-    console.log(`✂️ Using trim config: ${trimConfigPath}`);
 
     const trimTransformer = GetTrimTransformer(trimConfigPath);
 
