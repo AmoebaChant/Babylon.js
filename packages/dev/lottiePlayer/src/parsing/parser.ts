@@ -1,5 +1,5 @@
-import type { IVector2Like } from "core/Maths/math.like";
-import { ThinSprite } from "core/Sprites/thinSprite";
+import type { IVector2Like } from "@babylonjs/core-for-lottie-player/Maths/math.like";
+import { ThinSprite } from "@babylonjs/core-for-lottie-player/Sprites/thinSprite";
 
 import type {
     RawElement,

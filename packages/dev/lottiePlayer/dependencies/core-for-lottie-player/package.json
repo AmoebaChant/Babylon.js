@@ -15,10 +15,11 @@
         "NOTICE.md"
     ],
     "scripts": {
-        "build": "npm run clean && npm run compile",
-        "precompile": "npm run precompile -w @dev/core",
         "clean": "rimraf dist && rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
-        "compile": "build-tools -c build-and-trim --tsConfig tsconfig.build.json -- --trimConfig ./buildTrimConfig.json"
+        "build": "npm run compile",
+        "precompile": "npm run precompile -w @dev/core",
+        "compile": "build-tools -c build-and-trim --tsConfig tsconfig.build.json -- --trimConfig ./buildTrimConfig.json",
+        "postcompile": "build-tools -c run-tasks"
     },
     "devDependencies": {
         "@dev/build-tools": "^1.0.0",

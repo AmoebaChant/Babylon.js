@@ -1,4 +1,4 @@
-import type { IVector2Like } from "core/Maths/math.like";
+import type { IVector2Like } from "@babylonjs/core-for-lottie-player/Maths/math.like";
 
 import type { ScalarProperty, Vector2Property } from "../parsing/parsedTypes";
 

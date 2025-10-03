@@ -1,9 +1,9 @@
 {
-    "extends": "../../../tsconfig.build.json",
+    "extends": "../../../../../tsconfig.build.json",
 
     "compilerOptions": {
         "outDir": "./",
-        "rootDir": "../core/src",
+        "rootDir": "../../../core/src",
         "declaration": true,
         "target": "ES2020",
         "importHelpers": true,
@@ -34,5 +34,5 @@
         }
     },
 
-    "include": ["../core/src/**/*"]
+    "include": ["../../../core/src/**/*"]
 }

@@ -1,4 +1,4 @@
-import type { ThinSprite } from "core/Sprites/thinSprite";
+import type { ThinSprite } from "@babylonjs/core-for-lottie-player/Sprites/thinSprite";
 
 import type { ScalarProperty, Vector2Property } from "../parsing/parsedTypes";
 
