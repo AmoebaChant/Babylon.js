@@ -34,8 +34,6 @@ const GetRelativePath = (computedPath: string, sourceFilename: string) => {
  */
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const transformPackageLocation = (location: string, options: ITransformerOptions, sourceFilename?: string) => {
-    console.log("sourceFilename:", sourceFilename, "location:", location);
-
     const directoryParts = location.split("/");
     const basePackage = directoryParts[0] === "@" ? `${directoryParts.shift()}/${directoryParts.shift()}` : directoryParts.shift();
     if (basePackage === "tslib" && sourceFilename && options.buildType === "es6") {
@@ -50,7 +48,6 @@ export const transformPackageLocation = (location: string, options: ITransformer
         return AddJS(computedPath, options.appendJS);
     }
     if (!basePackage || !isValidDevPackageName(basePackage, true) || declarationsOnlyPackages.indexOf(basePackage) !== -1) {
-        console.log("    - early exit - ", "!basePackage:", !basePackage, "isValidDevPackageName:", !isValidDevPackageName(basePackage || "", true));
         return;
     }
 
@@ -75,12 +72,10 @@ export const transformPackageLocation = (location: string, options: ITransformer
     const returnPackage = getPublicPackageName(returnPackageVariable);
     // not found? probably an external library. return the same location
     if (!returnPackage) {
-        console.log("    - no returnPackage - not changing");
         return location;
     }
     if (returnPackage === options.basePackage) {
         if (options.keepDev) {
-            console.log("    - keepDev on - not changing");
             return location;
         }
         let computedPath = "./" + directoryParts.join("/");
@@ -88,15 +83,12 @@ export const transformPackageLocation = (location: string, options: ITransformer
             const result = GetPathForComputed(computedPath, sourceFilename);
             computedPath = GetRelativePath(result, sourceFilename);
         }
-        console.log("    - matches base package - calling AddJS");
         return AddJS(computedPath, options.appendJS);
     } else {
         if (directoryParts.length === 0) {
             // Do not add .js to imports that reference the root of a package
-            console.log("    - does not match base package - root - not adding js");
             return returnPackage;
         }
-        console.log("    - does not match base package - calling AddJS");
         return AddJS(options.packageOnly ? returnPackage : `${returnPackage}/${directoryParts.join("/")}`, options.appendJS);
     }
 };
