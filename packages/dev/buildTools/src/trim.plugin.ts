@@ -59,7 +59,42 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
                     const name = node.name;
                     if (ts.isIdentifier(name)) {
                         if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
-                            console.log("Removing method:", [...stackOfNames, name.escapedText.toString()].join("."));
+                            if (verbose) {
+                                console.log("Removing method:", [...stackOfNames, name.escapedText.toString()].join("."));
+                            }
+                            return undefined;
+                        }
+                        shouldVisitChildren = true;
+                    }
+                } else if (ts.isPropertyDeclaration(node)) {
+                    const name = node.name;
+                    if (ts.isIdentifier(name)) {
+                        if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
+                            if (verbose) {
+                                console.log("Removing property:", [...stackOfNames, name.escapedText.toString()].join("."));
+                            }
+                            return undefined;
+                        }
+                        shouldVisitChildren = true;
+                    }
+                } else if (ts.isGetAccessor(node)) {
+                    const name = node.name;
+                    if (ts.isIdentifier(name)) {
+                        if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
+                            if (verbose) {
+                                console.log("Removing get accessor:", [...stackOfNames, name.escapedText.toString()].join("."));
+                            }
+                            return undefined;
+                        }
+                        shouldVisitChildren = true;
+                    }
+                } else if (ts.isSetAccessor(node)) {
+                    const name = node.name;
+                    if (ts.isIdentifier(name)) {
+                        if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
+                            if (verbose) {
+                                console.log("Removing set accessor:", [...stackOfNames, name.escapedText.toString()].join("."));
+                            }
                             return undefined;
                         }
                         shouldVisitChildren = true;
