@@ -18,7 +18,8 @@
                 "basePackage": "@babylonjs/lottie-player",
                 "appendJS": true,
                 "translationOverrides": {
-                    "core": "@babylonjs/core-for-lottie-player"
+                    "core": "@babylonjs/core-for-lottie-player",
+                    "core-for-lottie-player": "@babylonjs/core-for-lottie-player"
                 }
             },
             {
@@ -28,14 +29,15 @@
                 "basePackage": "@babylonjs/lottie-player",
                 "appendJS": true,
                 "translationOverrides": {
-                    "core": "@babylonjs/core-for-lottie-player"
+                    "core": "@babylonjs/core-for-lottie-player",
+                    "core-for-lottie-player": "@babylonjs/core-for-lottie-player"
                 }
             }
         ],
         "paths": {
-            "core/*": ["dev/core-for-lottie-player/*"]
+            "core/*": ["public/@babylonjs/lottiePlayer/dependencies/core-for-lottie-player/*"],
+            "core-for-lottie-player/*": ["public/@babylonjs/lottiePlayer/dependencies/core-for-lottie-player/*"]
         }
     },
-
     "include": ["../../../dev/lottiePlayer/src/**/*"]
 }

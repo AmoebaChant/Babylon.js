@@ -1,0 +1,33 @@
+{
+    "name": "@babylonjs/core-for-lottie-player",
+    "version": "8.29.1",
+    "main": "index.js",
+    "module": "index.js",
+    "types": "index.d.ts",
+    "private": true,
+    "files": [
+        "**/*.js",
+        "**/*.d.ts",
+        "**/*.map",
+        "**/*.wasm",
+        "readme.md",
+        "license.md",
+        "NOTICE.md"
+    ],
+    "scripts": {
+        "build": "npm run clean && npm run compile",
+        "clean": "rimraf dist && rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
+        "precompile": "npm run precompile -w @dev/core",
+        "compile": "build-tools -c build-and-trim --tsConfig ./tsconfig.build.json -- --trimConfig ../../../../../dev/lottiePlayer/dependencies/core-for-lottie-player/buildTrimConfig.json",
+        "postcompile": "build-tools -c run-tasks"
+    },
+    "devDependencies": {
+        "@dev/build-tools": "^1.0.0",
+        "@lts/core": "^1.0.0"
+    },
+    "type": "module",
+    "sideEffects": [
+        "**/*",
+        "!src/Maths/ThinMaths/**"
+    ]
+}

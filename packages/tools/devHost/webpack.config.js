@@ -74,7 +74,7 @@ module.exports = (env) => {
                 "gui-editor": path.resolve(basePathForTools, "guiEditor", outputDirectoryForAliases),
                 accessibility: path.resolve(basePathForTools, "accessibility", outputDirectoryForAliases),
                 "babylonjs-gltf2interface": path.resolve("./src", "babylon.glTF2Interface.ts"),
-                "@babylonjs/core-for-lottie-player": path.resolve(basePathForSources, "lottiePlayer/dependencies/core-for-lottie-player", ""),
+                "core-for-lottie-player": path.resolve(basePathForSources, "lottiePlayer/dependencies/core-for-lottie-player", ""),
             },
             symlinks: false,
         },

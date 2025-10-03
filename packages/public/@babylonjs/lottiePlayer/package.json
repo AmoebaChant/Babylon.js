@@ -29,23 +29,22 @@
         "**/*.js",
         "**/*.d.ts",
         "**/*.map",
+        "./*.tgz",
         "readme.md",
         "license.md",
         "!build/**"
     ],
     "scripts": {
-        "build": "npm run clean && npm run consume:custom:core && npm run compile",
-        "clean": "rimraf *.tsbuildinfo -g && rimraf \"./**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\" -g",
-        "consume:custom:core": "rimraf vendor && mkdir vendor && cd vendor && npm pack -w @babylonjs/core-for-lottie-player",
+        "build": "npm run clean && npm run compile",
+        "clean": "rimraf -g *.tsbuildinfo && rimraf -g \"./*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs|dependencies)\" \"./!(dependencies)/**/*.!(cmd|md|json|build.json|lts.json|tasks.json|cjs)\"",
         "compile": "tsc -b tsconfig.build.json",
-        "postcompile": "build-tools -c add-js-to-es6",
-        "prepublishOnly": "node ./build/addDependency.cjs"
+        "postcompile": "build-tools -c add-js-to-es6"
     },
     "devDependencies": {
         "@dev/build-tools": "^1.0.0",
         "@dev/core": "^1.0.0"
     },
-    "peerDependencies": {
-        "@babylonjs/core": "^7.47.3 || ^8.0.1"
+    "dependencies": {
+        "@babylonjs/core-for-lottie-player": "file:babylonjs-core-for-lottie-player-8.29.1.tgz"
     }
 }

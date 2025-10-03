@@ -1,5 +1,5 @@
 {
-    "name": "@babylonjs/core-for-lottie-player",
+    "name": "@dev/core-for-lottie-player",
     "version": "1.0.0",
     "main": "index.js",
     "module": "index.js",

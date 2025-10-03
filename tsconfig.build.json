@@ -45,7 +45,8 @@
             "smart-filters": ["dev/smartFilters/dist"],
             "smart-filters-blocks": ["dev/smartFilterBlocks/dist"],
             "smart-filters-blocks/*": ["dev/smartFilterBlocks/dist/*"],
-            "smart-filters-editor-control": ["tools/smartFiltersEditorControl/dist"]
+            "smart-filters-editor-control": ["tools/smartFiltersEditorControl/dist"],
+            "core-for-lottie-player/*": ["dev/lottiePlayer/dependencies/core-for-lottie-player/*"]
         }
     },
 

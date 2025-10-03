@@ -74,7 +74,8 @@
             "smart-filters-blocks/*": ["dev/smartFilterBlocks/src/*"],
             "smart-filters-editor-control": ["tools/smartFiltersEditorControl/src"],
             "lottie-player": ["dev/lottiePlayer/src"],
-            "lottie-player/*": ["dev/lottiePlayer/src/*"]
+            "lottie-player/*": ["dev/lottiePlayer/src/*"],
+            "core-for-lottie-player/*": ["dev/lottiePlayer/dependencies/core-for-lottie-player/*"]
         }
     }
 }

@@ -57,14 +57,12 @@ export const transformPackageLocation = (location: string, options: ITransformer
     }
 
     // Check for translation overrides first
-    if (options.translationOverrides && options.translationOverrides[location]) {
-        const overridePackage = options.translationOverrides[location];
+    if (options.translationOverrides && options.translationOverrides[basePackage]) {
+        const overridePackage = options.translationOverrides[basePackage];
         if (directoryParts.length === 0) {
             // Do not add .js to imports that reference the root of a package
-            console.log("    - matches override - not adding .js because it's root of a package");
             return overridePackage;
         }
-        console.log("    - matches override - calling AddJS");
         return AddJS(options.packageOnly ? overridePackage : `${overridePackage}/${directoryParts.join("/")}`, options.appendJS);
     }
 

@@ -5,10 +5,7 @@
         "composite": true,
         "strict": true,
         "outDir": "./dist",
-        "rootDir": "./src",
-        "paths": {
-            "core/*": ["dev/lottiePlayer/dependencies/core-for-lottie-player/*"]
-        }
+        "rootDir": "./src"
     },
 
     "include": ["./src/**/*.ts", "./src/**/*.tsx"],

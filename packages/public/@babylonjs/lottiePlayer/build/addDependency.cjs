@@ -22,7 +22,8 @@ if (!packageObject.dependencies || typeof packageObject.dependencies !== "object
     packageObject.dependencies = {};
 }
 
-packageObject.dependencies["@babylonjs/core-for-lottie-player"] = "file:vendor/babylonjs-core-for-lottie-player-1.0.0.tgz";
+packageObject.dependencies["@babylonjs/core-for-lottie-player"] = "file:dependencies/core-for-lottie-player"
+";
 
 try {
     fs.writeFileSync(pkgPath, JSON.stringify(packageObject, null, 2) + "\n", "utf8");

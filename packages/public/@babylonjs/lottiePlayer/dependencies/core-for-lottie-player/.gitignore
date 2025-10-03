@@ -1,0 +1,12 @@
+# this is similar to a public package, even though it is only used by @babylonjs/lottie-player, ignore the code here, the real code lives in @dev/core
+node_modules
+*.js
+*.ts
+*.map
+*.scss
+*.css
+*.svg
+*.png
+*.jpg
+*.wasm
+*.license

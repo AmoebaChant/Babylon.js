@@ -1,0 +1,38 @@
+{
+    "extends": "../../../../../../tsconfig.build.json",
+
+    "compilerOptions": {
+        "outDir": "./",
+        "rootDir": "../../../../../dev/core/src",
+        "declaration": true,
+        "target": "ES2020",
+        "importHelpers": true,
+        "plugins": [
+            {
+                "transform": "@dev/build-tools/dist/pathTransform.js",
+                "after": true,
+                "buildType": "es6",
+                "basePackage": "@babylonjs/core",
+                "appendJS": true,
+                "translationOverrides": {
+                    "core": "@babylonjs/core-for-lottie-player"
+                }
+            },
+            {
+                "transform": "@dev/build-tools/dist/pathTransform.js",
+                "afterDeclarations": true,
+                "buildType": "es6",
+                "basePackage": "@babylonjs/core",
+                "appendJS": true,
+                "translationOverrides": {
+                    "core": "@babylonjs/core-for-lottie-player"
+                }
+            }
+        ],
+        "paths": {
+            "core/*": ["dev/core/src/*"]
+        }
+    },
+
+    "include": ["../../../../../dev/core/src/**/*"]
+}
