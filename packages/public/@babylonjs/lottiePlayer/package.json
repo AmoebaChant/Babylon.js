@@ -41,8 +41,7 @@
         "build:dependencies": "npm run build -w @babylonjs/core-for-lottie-player",
         "compile": "tsc -b tsconfig.build.json",
         "postcompile": "build-tools -c add-js-to-es6",
-        "prepack": "npm pack -w @babylonjs/core-for-lottie-player",
-        "prepublishOnly": "node ./build/addDependency.cjs"
+        "prepack": "npm pack -w @babylonjs/core-for-lottie-player && node ./build/addDependency.cjs"
     },
     "devDependencies": {
         "@dev/build-tools": "^1.0.0",

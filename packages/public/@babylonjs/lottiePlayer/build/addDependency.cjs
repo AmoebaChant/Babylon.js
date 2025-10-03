@@ -32,8 +32,9 @@ function getPackageJsonObject(pkgPath) {
  */
 function getCoreForLottiePlayerTgz() {
     const directoryToSearch = path.resolve(__dirname, "../");
+    console.log("Looking in directory:", directoryToSearch);
     const files = fs.readdirSync(directoryToSearch);
-    const coreForLottiePlayerTgz = files.find((file) => file.startsWith("babylonjs-lottie-player-") && file.endsWith(".tgz"));
+    const coreForLottiePlayerTgz = files.find((file) => file.startsWith("babylonjs-core-for-lottie-player") && file.endsWith(".tgz"));
     if (!coreForLottiePlayerTgz) {
         console.error("ERROR: Could not find the @babylonjs/core-for-lottie-player .tgz file in current directory");
         process.exit(1);
