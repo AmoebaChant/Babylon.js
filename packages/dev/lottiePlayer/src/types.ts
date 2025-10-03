@@ -1,4 +1,4 @@
-import type { Nullable } from "@babylonjs/core-for-lottie-player/types";
+import type { Nullable } from "core-for-lottie-player/types";
 import type { RawLottieAnimation } from "./parsing/rawTypes";
 import type { AnimationConfiguration } from "./animationConfiguration";
 

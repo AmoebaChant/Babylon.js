@@ -1,9 +1,9 @@
-import "@babylonjs/core-for-lottie-player/Engines/Extensions/engine.dynamicTexture";
+import "core-for-lottie-player/Engines/Extensions/engine.dynamicTexture";
 
-import type { ThinEngine } from "@babylonjs/core-for-lottie-player/Engines/thinEngine";
-import type { InternalTexture } from "@babylonjs/core-for-lottie-player/Materials/Textures/internalTexture";
-import type { IVector2Like } from "@babylonjs/core-for-lottie-player/Maths/math.like";
-import { ThinTexture } from "@babylonjs/core-for-lottie-player/Materials/Textures/thinTexture";
+import type { ThinEngine } from "core-for-lottie-player/Engines/thinEngine";
+import type { InternalTexture } from "core-for-lottie-player/Materials/Textures/internalTexture";
+import type { IVector2Like } from "core-for-lottie-player/Maths/math.like";
+import { ThinTexture } from "core-for-lottie-player/Materials/Textures/thinTexture";
 
 import type { RawBezier, RawElement, RawFillShape, RawFont, RawGradientFillShape, RawPathShape, RawRectangleShape, RawStrokeShape, RawTextData, RawTextDocument } from "./rawTypes";
 

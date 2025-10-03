@@ -1,5 +1,5 @@
-import type { IMatrixLike, IVector2Like } from "@babylonjs/core-for-lottie-player/Maths/math.like";
-import type { Tuple } from "@babylonjs/core-for-lottie-player/types";
+import type { IMatrixLike, IVector2Like } from "core-for-lottie-player/Maths/math.like";
+import type { Tuple } from "core-for-lottie-player/types";
 
 /**
  * Represents a Babylon.js thin version of a Matrix

@@ -1,11 +1,11 @@
-import "@babylonjs/core-for-lottie-player/Engines/Extensions/engine.dynamicBuffer";
-import "@babylonjs/core-for-lottie-player/Shaders/sprites.vertex";
-import "@babylonjs/core-for-lottie-player/Shaders/sprites.fragment";
+import "core-for-lottie-player/Engines/Extensions/engine.dynamicBuffer";
+import "core-for-lottie-player/Shaders/sprites.vertex";
+import "core-for-lottie-player/Shaders/sprites.fragment";
 
-import type { ThinEngine } from "@babylonjs/core-for-lottie-player/Engines/thinEngine";
-import type { ThinTexture } from "@babylonjs/core-for-lottie-player/Materials/Textures/thinTexture";
-import type { ThinSprite } from "@babylonjs/core-for-lottie-player/Sprites/thinSprite";
-import { SpriteRenderer } from "@babylonjs/core-for-lottie-player/Sprites/spriteRenderer";
+import type { ThinEngine } from "core-for-lottie-player/Engines/thinEngine";
+import type { ThinTexture } from "core-for-lottie-player/Materials/Textures/thinTexture";
+import type { ThinSprite } from "core-for-lottie-player/Sprites/thinSprite";
+import { SpriteRenderer } from "core-for-lottie-player/Sprites/spriteRenderer";
 
 import type { ThinMatrix } from "../maths/matrix";
 

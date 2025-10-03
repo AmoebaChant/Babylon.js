@@ -1,6 +1,6 @@
 /* eslint-disable require-atomic-updates */
 // Keep only type-only imports at module scope so nothing with side-effects runs in the worker at load time
-import type { Nullable } from "@babylonjs/core-for-lottie-player/types";
+import type { Nullable } from "core-for-lottie-player/types";
 import type { AnimationConfiguration } from "./animationConfiguration";
 import type { RawLottieAnimation } from "./parsing/rawTypes";
 import type { AnimationController } from "./rendering/animationController";

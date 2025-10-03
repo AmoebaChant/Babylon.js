@@ -1,9 +1,9 @@
-import "@babylonjs/core-for-lottie-player/Engines/Extensions/engine.alpha";
-import "@babylonjs/core-for-lottie-player/Shaders/sprites.vertex";
-import "@babylonjs/core-for-lottie-player/Shaders/sprites.fragment";
+import "core-for-lottie-player/Engines/Extensions/engine.alpha";
+import "core-for-lottie-player/Shaders/sprites.vertex";
+import "core-for-lottie-player/Shaders/sprites.fragment";
 
-import { ThinEngine } from "@babylonjs/core-for-lottie-player/Engines/thinEngine";
-import { Viewport } from "@babylonjs/core-for-lottie-player/Maths/math.viewport";
+import { ThinEngine } from "core-for-lottie-player/Engines/thinEngine";
+import { Viewport } from "core-for-lottie-player/Maths/math.viewport";
 
 import { RenderingManager } from "./renderingManager";
 
