@@ -127,6 +127,19 @@
             "problemMatcher": ["$tsc"]
         },
         {
+            "label": "Build Lottie Depencies",
+            "type": "shell",
+            "command": "npm run build -w @dev/core-for-lottie-player",
+            "isBackground": false,
+            "runOptions": {
+                "instanceLimit": 1
+            },
+            "presentation": {
+                "group": "build"
+            },
+            "problemMatcher": ["$tsc"]
+        },
+        {
             "label": "Build (LTS)",
             "type": "shell",
             "command": "npm run build:lts",
@@ -197,7 +210,7 @@
         },
         {
             "label": "Run Dev host (Dev)",
-            "dependsOn": ["Build (Dev)"],
+            "dependsOn": ["Build (Dev)", "Build Lottie Depencies"],
             "type": "shell",
             "command": "npm",
             "runOptions": {
