@@ -16,16 +16,6 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
     const trimTransformerFactory: ts.TransformerFactory<ts.SourceFile> = (context) => {
         return (sourceFile: ts.SourceFile) => {
             /**
-             * A stack of the previous levels of trim configuration objects.
-             */
-            const previousLevelsOfTrimConfig: {}[] = [];
-
-            /**
-             * The current level of the trim configuration object.
-             */
-            let currentLevelOfTrimConfig = trimConfig;
-
-            /**
              * A stack of human readable names of the previous levels of the trim configuration objects.
              */
             const stackOfNames: string[] = [];
@@ -38,9 +28,7 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
                     const name = node.name?.escapedText;
 
                     if (name) {
-                        if (currentLevelOfTrimConfig[name]) {
-                            previousLevelsOfTrimConfig.push(currentLevelOfTrimConfig);
-                            currentLevelOfTrimConfig = currentLevelOfTrimConfig[name];
+                        if (trimConfig[name]) {
                             if (verbose) {
                                 console.log("Visiting class:", name);
                             }
@@ -57,47 +45,35 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
                     }
                 } else if (ts.isMethodDeclaration(node)) {
                     const name = node.name;
-                    if (ts.isIdentifier(name)) {
-                        if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
-                            if (verbose) {
-                                console.log("Removing method:", [...stackOfNames, name.escapedText.toString()].join("."));
-                            }
-                            return undefined;
+                    if (ts.isIdentifier(name) && shouldRemoveNode(trimConfig, stackOfNames, name.escapedText.toString())) {
+                        if (verbose) {
+                            console.log("Removing method:", [...stackOfNames, name.escapedText.toString()].join("."));
                         }
-                        shouldVisitChildren = true;
+                        return undefined;
                     }
                 } else if (ts.isPropertyDeclaration(node)) {
                     const name = node.name;
-                    if (ts.isIdentifier(name)) {
-                        if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
-                            if (verbose) {
-                                console.log("Removing property:", [...stackOfNames, name.escapedText.toString()].join("."));
-                            }
-                            return undefined;
+                    if (ts.isIdentifier(name) && shouldRemoveNode(trimConfig, stackOfNames, name.escapedText.toString())) {
+                        if (verbose) {
+                            console.log("Removing property:", [...stackOfNames, name.escapedText.toString()].join("."));
                         }
-                        shouldVisitChildren = true;
+                        return undefined;
                     }
                 } else if (ts.isGetAccessor(node)) {
                     const name = node.name;
-                    if (ts.isIdentifier(name)) {
-                        if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
-                            if (verbose) {
-                                console.log("Removing get accessor:", [...stackOfNames, name.escapedText.toString()].join("."));
-                            }
-                            return undefined;
+                    if (ts.isIdentifier(name) && shouldRemoveNode(trimConfig, stackOfNames, name.escapedText.toString())) {
+                        if (verbose) {
+                            console.log("Removing get accessor:", [...stackOfNames, name.escapedText.toString()].join("."));
                         }
-                        shouldVisitChildren = true;
+                        return undefined;
                     }
                 } else if (ts.isSetAccessor(node)) {
                     const name = node.name;
-                    if (ts.isIdentifier(name)) {
-                        if (currentLevelOfTrimConfig[name.escapedText.toString()] === true) {
-                            if (verbose) {
-                                console.log("Removing set accessor:", [...stackOfNames, name.escapedText.toString()].join("."));
-                            }
-                            return undefined;
+                    if (ts.isIdentifier(name) && shouldRemoveNode(trimConfig, stackOfNames, name.escapedText.toString())) {
+                        if (verbose) {
+                            console.log("Removing set accessor:", [...stackOfNames, name.escapedText.toString()].join("."));
                         }
-                        shouldVisitChildren = true;
+                        return undefined;
                     }
                 }
 
@@ -108,7 +84,6 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
                     console.log("Done visiting class:", node.name?.escapedText);
                 }
                 if (pushedOntoStack) {
-                    currentLevelOfTrimConfig = previousLevelsOfTrimConfig.pop();
                     stackOfNames.pop();
                 }
                 return toReturn;
@@ -123,4 +98,23 @@ export function GetTrimTransformerFactory(configFileName: string, verbose: boole
     };
 
     return trimTransformerFactory;
+}
+
+function shouldRemoveNode(trimConfig: any, path: string[], nodeName: string): boolean {
+    let currentLevel = trimConfig;
+
+    for (const segment of path) {
+        if (currentLevel[segment]) {
+            currentLevel = currentLevel[segment];
+        } else {
+            return false;
+        }
+    }
+
+    // If currentLevel is an array, return true if it contains NodeName
+    if (Array.isArray(currentLevel)) {
+        return currentLevel.includes(nodeName);
+    }
+
+    return false;
 }
