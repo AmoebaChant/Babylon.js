@@ -34,6 +34,15 @@ const getNewVersion = () => {
     return version;
 };
 
+const setIfPackageIsPrivate = (path, isPrivate) => {
+    const rawdata = fs.readFileSync(path, "utf-8");
+    const packageJson = JSON.parse(rawdata);
+    if (packageJson.private !== isPrivate) {
+        packageJson.private = isPrivate;
+        fs.writeFileSync(path, JSON.stringify(packageJson, null, 4));
+    }
+};
+
 const updateEngineVersion = async (version) => {
     // get thinEngine.ts
     const abstractEngineFile = path.join(baseDirectory, "packages", "dev", "core", "src", "Engines", "abstractEngine.ts");
@@ -105,11 +114,24 @@ const updatePeerDependencies = async (version) => {
 };
 
 async function runTagsUpdate() {
-    await runCommand(
-        `npx lerna version ${config.versionDefinition} --yes --no-push --conventional-prerelease --force-publish --no-private --no-git-tag-version ${
-            config.preid ? "--preid " + config.preid : ""
-        }`
-    );
+    // Note: we don't want to rev versions of private packages, but @babylonjs/core-for-lottie-player is a special case.
+    // We do want to rev it since it is distributed as a packaged dependency in @babylonjs/lottie-player, but we don't
+    // want to publish it. Instead of removing --no-private below, which would rev packages we don't want to rev, we mark it
+    // as not private so we can update the version, then we restore it to private so it doesn't get published
+    const coreForLottiePlayerPackagePath = path.join(baseDirectory, "packages", "public", "@babylonjs", "lottiePlayer", "dependencies", "core-for-lottie-player", "package.json");
+    setIfPackageIsPrivate(coreForLottiePlayerPackagePath, false);
+
+    try {
+        // Update the version of all packages who are not marked as private
+        await runCommand(
+            `npx lerna version ${config.versionDefinition} --yes --no-push --conventional-prerelease --force-publish --no-private --no-git-tag-version ${
+                config.preid ? "--preid " + config.preid : ""
+            }`
+        );
+    } finally {
+        setIfPackageIsPrivate(coreForLottiePlayerPackagePath, true);
+    }
+
     // update package-json
     const version = getNewVersion();
     // // update engine version
