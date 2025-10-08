@@ -2710,6 +2710,10 @@
             "renderCount": 40
         },
         {
+            "title": "FrameGraph convolution post process",
+            "playgroundId": "#SYQW69#1318"
+        },
+        {
             "title": "Render target texture with clustered lights",
             "playgroundId": "#1QCA2M#11"
         },
@@ -3017,6 +3021,10 @@
             "title": "OpenPBR Coat Roughness vs Coat Ior - IBL",
             "playgroundId": "#GRQHVV#81",
             "excludedEngines": ["webgl1"]
+        },
+        {
+            "title": "Background material blur",
+            "playgroundId": "#UU7RQ#4458"
         }
     ]
 }
