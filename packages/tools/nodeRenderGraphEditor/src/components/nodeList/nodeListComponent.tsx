@@ -64,6 +64,8 @@ export class NodeListComponent extends React.Component<INodeListComponentProps, 
         GrainBlock: "Applies a grain post process",
         MotionBlurBlock: "Applies a motion blur post process",
         ConvolutionBlock: "Applies a convolution post process",
+        ScreenSpaceCurvatureBlock: "Applies a screen space curvature post process",
+        SharpenBlock: "Applies a sharpen post process",
     };
 
     private _customFrameList: { [key: string]: string };
@@ -175,6 +177,8 @@ export class NodeListComponent extends React.Component<INodeListComponentProps, 
                 "MotionBlurBlock",
                 "PassBlock",
                 "PassCubeBlock",
+                "ScreenSpaceCurvatureBlock",
+                "SharpenBlock",
                 "SSRBlock",
             ],
             Output_Nodes: ["OutputBlock"],

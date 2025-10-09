@@ -23,6 +23,8 @@ export * from "./PostProcesses/grainPostProcessBlock";
 export * from "./PostProcesses/imageProcessingPostProcessBlock";
 export * from "./PostProcesses/motionBlurPostProcessBlock";
 export * from "./PostProcesses/passPostProcessBlock";
+export * from "./PostProcesses/sharpenPostProcessBlock";
+export * from "./PostProcesses/screenSpaceCurvaturePostProcessBlock";
 export * from "./PostProcesses/ssrPostProcessBlock";
 
 export * from "./Rendering/csmShadowGeneratorBlock";
