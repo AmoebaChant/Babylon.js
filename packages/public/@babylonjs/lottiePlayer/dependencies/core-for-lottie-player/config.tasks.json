@@ -2,6 +2,10 @@
     "commands": [
         {
             "command": "add-js-to-es6"
+        },
+        {
+            "command": "prepare-es6-build",
+            "args": ["-cf", "Engines/constants.js"]
         }
     ]
 }
