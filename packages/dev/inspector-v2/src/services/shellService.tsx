@@ -3,6 +3,7 @@ import type { ComponentType, FunctionComponent } from "react";
 
 import type { IDisposable, Nullable } from "core/index";
 import type { IService, ServiceDefinition } from "../modularity/serviceDefinition";
+import type { SettingDescriptor } from "./settingsStore";
 
 import {
     Button,
@@ -47,10 +48,37 @@ import { ErrorBoundary } from "../components/errorBoundary";
 import { TeachingMoment } from "../components/teachingMoment";
 import { Theme } from "../components/theme";
 import { useOrderedObservableCollection } from "../hooks/observableHooks";
-import { useSidePaneDockOverrides } from "../hooks/settingsHooks";
+import { useSetting } from "../hooks/settingsHooks";
 import { MakePopoverTeachingMoment } from "../hooks/teachingMomentHooks";
 import { useResizeHandle } from "../hooks/useResizeHandle";
 import { ObservableCollection } from "../misc/observableCollection";
+
+export const SidePaneDockOverridesSettingDescriptor: SettingDescriptor<
+    Record<string, Readonly<{ horizontalLocation: HorizontalLocation; verticalLocation: VerticalLocation }> | undefined>
+> = {
+    key: "SidePaneDockOverrides",
+    defaultValue: {},
+};
+
+export const LeftSidePaneWidthAdjustSettingDescriptor: SettingDescriptor<number> = {
+    key: "Shell/LeftPane/WidthAdjust",
+    defaultValue: 0,
+};
+
+export const LeftSidePaneHeightAdjustSettingDescriptor: SettingDescriptor<number> = {
+    key: "Shell/LeftPane/HeightAdjust",
+    defaultValue: 0,
+};
+
+export const RightSidePaneWidthAdjustSettingDescriptor: SettingDescriptor<number> = {
+    key: "Shell/RightPane/WidthAdjust",
+    defaultValue: 0,
+};
+
+export const RightSidePaneHeightAdjustSettingDescriptor: SettingDescriptor<number> = {
+    key: "Shell/RightPane/HeightAdjust",
+    defaultValue: 0,
+};
 
 export type HorizontalLocation = "left" | "right";
 export type VerticalLocation = "top" | "bottom";
@@ -152,6 +180,12 @@ export type SidePaneDefinition = {
      * Teaching moments are more helpful for dynamically added panes, possibly from extensions.
      */
     suppressTeachingMoment?: boolean;
+
+    /**
+     * Keep the pane mounted even when it is not visible. This is useful if you don't want the
+     * user to lose the complex visual state when switching between tabs.
+     */
+    keepMounted?: boolean;
 };
 
 type RegisteredSidePane = {
@@ -163,6 +197,9 @@ type SidePaneContainer = {
     readonly isDocked: boolean;
     dock(): void;
     undock(): void;
+    readonly isCollapsed: boolean;
+    collapse(): void;
+    expand(): void;
 };
 
 /**
@@ -224,11 +261,6 @@ export interface IShellService extends IService<typeof ShellServiceIdentity> {
     addCentralContent(content: Readonly<CentralContentDefinition>): IDisposable;
 
     /**
-     * Resets the side pane layout to the default configuration.
-     */
-    resetSidePaneLayout(): void;
-
-    /**
      * The left side pane container.
      */
     readonly leftSidePaneContainer: Nullable<SidePaneContainer>;
@@ -277,6 +309,16 @@ export type ShellServiceOptions = {
      * In "compact" mode, toolbars are displayed at the top and bottom of the left and right side panes.
      */
     toolbarMode?: ToolbarMode;
+
+    /**
+     * Whether the left side pane should start collapsed. Default is false.
+     */
+    leftPaneDefaultCollapsed?: boolean;
+
+    /**
+     * Whether the right side pane should start collapsed. Default is false.
+     */
+    rightPaneDefaultCollapsed?: boolean;
 
     /**
      * A function that can remap the default location of side panes.
@@ -695,13 +737,14 @@ function usePane(
     dockOperations: Map<DockLocation, (sidePaneKey: string) => void>,
     toolbarMode: ToolbarMode,
     topBarItems: Readonly<ToolbarItemDefinition[]>,
-    bottomBarItems: Readonly<ToolbarItemDefinition[]>
+    bottomBarItems: Readonly<ToolbarItemDefinition[]>,
+    initialCollapsed: boolean
 ) {
     const classes = useStyles();
 
     const [topSelectedTab, setTopSelectedTab] = useState<SidePaneDefinition>();
     const [bottomSelectedTab, setBottomSelectedTab] = useState<SidePaneDefinition>();
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(initialCollapsed);
     const childWindow = useRef<ChildWindow>(null);
     const [isChildWindowOpen, setIsChildWindowOpen] = useState(false);
     const paneContainerRef = useRef<HTMLDivElement>(null);
@@ -710,8 +753,8 @@ function usePane(
         setCollapsed((collapsed) => !collapsed);
     }, []);
 
-    const widthStorageKey = `Babylon/Settings/${location}Pane/WidthAdjust`;
-    const heightStorageKey = `Babylon/Settings/${location}Pane/HeightAdjust`;
+    const [paneWidthSetting, setPaneWidthSetting] = useSetting(location === "left" ? LeftSidePaneWidthAdjustSettingDescriptor : RightSidePaneWidthAdjustSettingDescriptor);
+    const [paneHeightSetting, setPaneHeightSetting] = useSetting(location === "left" ? LeftSidePaneHeightAdjustSettingDescriptor : RightSidePaneHeightAdjustSettingDescriptor);
 
     const currentSidePanes = useMemo(() => sidePanes.filter((entry) => entry.horizontalLocation === location), [sidePanes, location]);
     const topPanes = useMemo(() => currentSidePanes.filter((entry) => entry.verticalLocation === "top"), [currentSidePanes]);
@@ -924,7 +967,7 @@ function usePane(
         minValue: minWidth - defaultWidth,
         onChange: (value) => {
             // Whenever the width is adjusted, store the value.
-            localStorage.setItem(widthStorageKey, value.toString());
+            setPaneWidthSetting(value);
         },
     });
 
@@ -939,22 +982,15 @@ function usePane(
         variableName: paneHeightAdjustCSSVar,
         onChange: (value) => {
             // Whenever the height is adjusted, store the value.
-            localStorage.setItem(heightStorageKey, value.toString());
+            setPaneHeightSetting(value);
         },
     });
 
     // This ensures that when the component is first rendered, the CSS variable is set from storage.
     useLayoutEffect(() => {
-        const storedPaneWidthAdjust = localStorage.getItem(widthStorageKey);
-        if (storedPaneWidthAdjust) {
-            setPaneWidthAdjust(Number.parseInt(storedPaneWidthAdjust));
-        }
-
-        const storedPaneHeightAdjust = localStorage.getItem(heightStorageKey);
-        if (storedPaneHeightAdjust) {
-            setPaneHeightAdjust(Number.parseInt(storedPaneHeightAdjust));
-        }
-    }, []);
+        setPaneWidthAdjust(paneWidthSetting);
+        setPaneHeightAdjust(paneHeightSetting);
+    }, [paneWidthSetting, paneHeightSetting]);
 
     // This effect closes the window if all panes have been removed.
     useEffect(() => {
@@ -987,13 +1023,15 @@ function usePane(
                             <>
                                 <PaneHeader id={topSelectedTab.key} title={topSelectedTab.title} dockOptions={validTopDockOptions} />
                                 {/* Render all panes to retain their state even when they are not selected, but only display the selected pane. */}
-                                {topPanes.map((pane) => (
-                                    <div key={pane.key} className={mergeClasses(classes.paneContent, pane.key !== topSelectedTab.key ? classes.unselectedPane : undefined)}>
-                                        <ErrorBoundary name={pane.title}>
-                                            <pane.content />
-                                        </ErrorBoundary>
-                                    </div>
-                                ))}
+                                {topPanes
+                                    .filter((pane) => pane.key === topSelectedTab.key || pane.keepMounted)
+                                    .map((pane) => (
+                                        <div key={pane.key} className={mergeClasses(classes.paneContent, pane.key !== topSelectedTab.key ? classes.unselectedPane : undefined)}>
+                                            <ErrorBoundary name={pane.title}>
+                                                <pane.content />
+                                            </ErrorBoundary>
+                                        </div>
+                                    ))}
                             </>
                         )}
                     </div>
@@ -1020,13 +1058,15 @@ function usePane(
                             <>
                                 <PaneHeader id={bottomSelectedTab.key} title={bottomSelectedTab.title} dockOptions={validBottomDockOptions} />
                                 {/* Render all panes to retain their state even when they are not selected, but only display the selected pane. */}
-                                {bottomPanes.map((pane) => (
-                                    <div key={pane.key} className={mergeClasses(classes.paneContent, pane.key !== bottomSelectedTab.key ? classes.unselectedPane : undefined)}>
-                                        <ErrorBoundary name={pane.title}>
-                                            <pane.content />
-                                        </ErrorBoundary>
-                                    </div>
-                                ))}
+                                {bottomPanes
+                                    .filter((pane) => pane.key === bottomSelectedTab.key || pane.keepMounted)
+                                    .map((pane) => (
+                                        <div key={pane.key} className={mergeClasses(classes.paneContent, pane.key !== bottomSelectedTab.key ? classes.unselectedPane : undefined)}>
+                                            <ErrorBoundary name={pane.title}>
+                                                <pane.content />
+                                            </ErrorBoundary>
+                                        </div>
+                                    ))}
                             </>
                         )}
                     </div>
@@ -1091,7 +1131,9 @@ function usePane(
         );
     }, [collapsed, corePane]);
 
-    return [topPaneTabList, pane, collapsed, setCollapsed, isChildWindowOpen, setUndocked] as const;
+    const hasPanes = topPanes.length > 0 || bottomPanes.length > 0;
+
+    return [topPaneTabList, pane, collapsed, setCollapsed, isChildWindowOpen, setUndocked, hasPanes] as const;
 }
 
 export function MakeShellServiceDefinition({
@@ -1099,11 +1141,13 @@ export function MakeShellServiceDefinition({
     leftPaneMinWidth = 350,
     rightPaneDefaultWidth = 350,
     rightPaneMinWidth = 350,
+    leftPaneDefaultCollapsed = false,
+    rightPaneDefaultCollapsed = false,
     toolbarMode = "full",
     sidePaneRemapper = undefined,
 }: ShellServiceOptions = {}): ServiceDefinition<[IShellService, IRootComponentService], []> {
     return {
-        friendlyName: "MainView",
+        friendlyName: "Shell Service",
         produces: [ShellServiceIdentity, RootComponentServiceIdentity],
         factory: () => {
             const toolbarItemCollection = new ObservableCollection<Readonly<ToolbarItemDefinition>>();
@@ -1113,23 +1157,30 @@ export function MakeShellServiceDefinition({
             const onSelectSidePane = new Observable<string>(undefined, true);
 
             const onDockChanged = new Observable<{ location: HorizontalLocation; dock: boolean }>(undefined, true);
+            const onCollapseChanged = new Observable<{ location: HorizontalLocation; collapsed: boolean }>();
             const leftSidePaneContainerState = {
                 isPresent: false,
                 isDocked: true,
                 dock: () => onDockChanged.notifyObservers({ location: "left", dock: true }),
                 undock: () => onDockChanged.notifyObservers({ location: "left", dock: false }),
+                isCollapsed: leftPaneDefaultCollapsed,
+                collapse: () => onCollapseChanged.notifyObservers({ location: "left", collapsed: true }),
+                expand: () => onCollapseChanged.notifyObservers({ location: "left", collapsed: false }),
             };
             const rightSidePaneContainerState = {
                 isPresent: false,
                 isDocked: true,
                 dock: () => onDockChanged.notifyObservers({ location: "right", dock: true }),
                 undock: () => onDockChanged.notifyObservers({ location: "right", dock: false }),
+                isCollapsed: rightPaneDefaultCollapsed,
+                collapse: () => onCollapseChanged.notifyObservers({ location: "right", collapsed: true }),
+                expand: () => onCollapseChanged.notifyObservers({ location: "right", collapsed: false }),
             };
 
             const rootComponent: FunctionComponent = () => {
                 const classes = useStyles();
 
-                const [sidePaneDockOverrides, setSidePaneDockOverrides] = useSidePaneDockOverrides();
+                const [sidePaneDockOverrides, setSidePaneDockOverrides] = useSetting(SidePaneDockOverridesSettingDescriptor);
 
                 // This function returns a promise that resolves after the dock change takes effect so that
                 // we can then select the re-docked pane.
@@ -1294,7 +1345,7 @@ export function MakeShellServiceDefinition({
 
                 const centralContents = useOrderedObservableCollection(centralContentCollection);
 
-                const [leftPaneTabList, leftPane, leftPaneCollapsed, setLeftPaneCollapsed, leftPaneUndocked, setLeftPaneUndocked] = usePane(
+                const [leftPaneTabList, leftPane, leftPaneCollapsed, setLeftPaneCollapsed, leftPaneUndocked, setLeftPaneUndocked, leftPaneHasPanes] = usePane(
                     "left",
                     leftPaneDefaultWidth,
                     leftPaneMinWidth,
@@ -1303,7 +1354,8 @@ export function MakeShellServiceDefinition({
                     sidePaneDockOperations,
                     toolbarMode,
                     topBarLeftItems,
-                    bottomBarLeftItems
+                    bottomBarLeftItems,
+                    leftPaneDefaultCollapsed
                 );
 
                 useEffect(() => {
@@ -1311,7 +1363,12 @@ export function MakeShellServiceDefinition({
                     leftSidePaneContainerState.isDocked = !leftPaneUndocked;
                 }, [leftPaneUndocked]);
 
-                const [rightPaneTabList, rightPane, rightPaneCollapsed, setRightPaneCollapsed, rightPaneUndocked, setRightPaneUndocked] = usePane(
+                useEffect(() => {
+                    // Propagate shorter lived React component state out to longer lived service state.
+                    leftSidePaneContainerState.isCollapsed = leftPaneCollapsed;
+                }, [leftPaneCollapsed]);
+
+                const [rightPaneTabList, rightPane, rightPaneCollapsed, setRightPaneCollapsed, rightPaneUndocked, setRightPaneUndocked, rightPaneHasPanes] = usePane(
                     "right",
                     rightPaneDefaultWidth,
                     rightPaneMinWidth,
@@ -1320,13 +1377,19 @@ export function MakeShellServiceDefinition({
                     sidePaneDockOperations,
                     toolbarMode,
                     topBarRightItems,
-                    bottomBarRightItems
+                    bottomBarRightItems,
+                    rightPaneDefaultCollapsed
                 );
 
                 useEffect(() => {
                     // Propagate shorter lived React component state out to longer lived service state.
                     rightSidePaneContainerState.isDocked = !rightPaneUndocked;
                 }, [rightPaneUndocked]);
+
+                useEffect(() => {
+                    // Propagate shorter lived React component state out to longer lived service state.
+                    rightSidePaneContainerState.isCollapsed = rightPaneCollapsed;
+                }, [rightPaneCollapsed]);
 
                 useEffect(() => {
                     // If at the service level dock state change is requested, propagate to the React component state.
@@ -1344,6 +1407,23 @@ export function MakeShellServiceDefinition({
                         rightSidePaneContainerState.isDocked = true;
                     };
                 }, [setLeftPaneUndocked, setRightPaneUndocked]);
+
+                useEffect(() => {
+                    // If at the service level collapse state change is requested, propagate to the React component state.
+                    const observer = onCollapseChanged.add(({ location, collapsed }) => {
+                        if (location === "left") {
+                            setLeftPaneCollapsed(collapsed);
+                        } else {
+                            setRightPaneCollapsed(collapsed);
+                        }
+                    });
+
+                    return () => {
+                        observer.remove();
+                        leftSidePaneContainerState.isCollapsed = false;
+                        rightSidePaneContainerState.isCollapsed = false;
+                    };
+                }, [setLeftPaneCollapsed, setRightPaneCollapsed]);
 
                 return (
                     <div className={classes.mainView}>
@@ -1372,14 +1452,14 @@ export function MakeShellServiceDefinition({
                                 ))}
                                 {toolbarMode === "compact" && (
                                     <>
-                                        <FluentFade visible={leftPaneCollapsed} delay={50} duration={100} unmountOnExit>
+                                        <FluentFade visible={leftPaneCollapsed && leftPaneHasPanes} delay={50} duration={100} unmountOnExit>
                                             <div className={mergeClasses(classes.expandButtonContainer, classes.expandButtonContainerLeft)}>
                                                 <Tooltip content="Show Side Pane">
                                                     <Button className={classes.expandButton} icon={<PanelLeftExpandRegular />} onClick={() => setLeftPaneCollapsed(false)} />
                                                 </Tooltip>
                                             </div>
                                         </FluentFade>
-                                        <FluentFade visible={rightPaneCollapsed} delay={50} duration={100} unmountOnExit>
+                                        <FluentFade visible={rightPaneCollapsed && rightPaneHasPanes} delay={50} duration={100} unmountOnExit>
                                             <div className={mergeClasses(classes.expandButtonContainer, classes.expandButtonContainerRight)}>
                                                 <Tooltip content="Show Side Pane">
                                                     <Button className={classes.expandButton} icon={<PanelRightExpandRegular />} onClick={() => setRightPaneCollapsed(false)} />
@@ -1423,7 +1503,6 @@ export function MakeShellServiceDefinition({
                     return sidePaneCollection.add(entry);
                 },
                 addCentralContent: (entry) => centralContentCollection.add(entry),
-                resetSidePaneLayout: () => localStorage.removeItem("Babylon/Settings/SidePaneDockOverrides"),
                 get leftSidePaneContainer() {
                     return leftSidePaneContainerState.isPresent ? leftSidePaneContainerState : null;
                 },

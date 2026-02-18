@@ -1,6 +1,6 @@
 {
     "name": "@babylonjs/inspector",
-    "version": "8.50.1",
+    "version": "8.51.2",
     "type": "module",
     "main": "lib/index.js",
     "module": "lib/index.js",
@@ -39,6 +39,7 @@
         "@dev/build-tools": "^1.0.0",
         "@dev/inspector": "1.0.0",
         "@rollup/plugin-alias": "^5.1.0",
+        "@rollup/plugin-commonjs": "^26.0.1",
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-typescript": "^11.1.6",
         "chalk": "^5.3.0",

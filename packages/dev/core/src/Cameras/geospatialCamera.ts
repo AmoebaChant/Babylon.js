@@ -1,8 +1,9 @@
 import { GeospatialCameraInputsManager } from "./geospatialCameraInputsManager";
-import { Vector3, Matrix, TmpVectors, Quaternion } from "../Maths/math.vector";
+import { Vector3, Matrix, TmpVectors } from "../Maths/math.vector";
 import type { Vector2 } from "../Maths/math.vector";
 import { Epsilon } from "../Maths/math.constants";
 import { Camera } from "./camera";
+import { serialize, serializeAsVector3 } from "../Misc/decorators";
 import type { Scene } from "../scene";
 import type { MeshPredicate } from "../Culling/ray.core";
 import type { DeepImmutable } from "../types";
@@ -16,6 +17,7 @@ import { InterpolatingBehavior } from "../Behaviors/Cameras/interpolatingBehavio
 import type { Collider } from "../Collisions/collider";
 import type { EasingFunction } from "../Animations/easing";
 import type { Animation } from "../Animations/animation";
+import { RegisterClass } from "../Misc/typeStore";
 
 export type GeospatialCameraOptions = {
     /**
@@ -55,6 +57,7 @@ export class GeospatialCamera extends Camera {
     /** Public option to customize the collision offset applied each frame - vs the one calculated using internal CollisionCoordinator */
     public perFrameCollisionOffset: Vector3 = new Vector3();
     /** Enable or disable collision checking for this camera. Default is false. */
+    @serialize()
     public checkCollisions: boolean = false;
 
     constructor(name: string, scene: Scene, options: GeospatialCameraOptions) {
@@ -72,6 +75,7 @@ export class GeospatialCamera extends Camera {
         this.inputs.addMouse().addMouseWheel().addKeyboard();
     }
 
+    @serializeAsVector3()
     private _center: Vector3 = new Vector3();
     /** The point on the globe that we are anchoring around. If no alternate rotation point is supplied, this will represent the center of screen*/
     public get center(): Vector3 {
@@ -87,6 +91,7 @@ export class GeospatialCamera extends Camera {
         this._setOrientation(this._yaw, this._pitch, this._radius, this._center);
     }
 
+    @serialize()
     private _yaw: number = 0;
     /**
      * Gets the camera's yaw (rotation around the geocentric normal) in radians
@@ -103,6 +108,7 @@ export class GeospatialCamera extends Camera {
         yaw !== this._yaw && this._setOrientation(yaw, this.pitch, this.radius, this.center);
     }
 
+    @serialize()
     private _pitch: number = 0;
 
     /**
@@ -124,6 +130,7 @@ export class GeospatialCamera extends Camera {
         pitch !== this._pitch && this._setOrientation(this.yaw, pitch, this.radius, this.center);
     }
 
+    @serialize()
     private _radius: number = 0;
     public get radius(): number {
         return this._radius;
@@ -163,7 +170,7 @@ export class GeospatialCamera extends Camera {
         this._checkLimits();
 
         // Refresh local basis at center (treat these as read-only for the whole call)
-        ComputeLocalBasisToRefs(this._center, this._tempEast, this._tempNorth, this._tempUp);
+        ComputeLocalBasisToRefs(this._center, this._tempEast, this._tempNorth, this._tempUp, this._scene.useRightHandedSystem);
 
         // Compute lookAt from yaw/pitch
         ComputeLookAtFromYawPitchToRef(this._yaw, this._pitch, this._center, this._scene.useRightHandedSystem, this._lookAtVector);
@@ -173,12 +180,14 @@ export class GeospatialCamera extends Camera {
         const right = TmpVectors.Vector3[10];
         Vector3.CrossToRef(this._tempUp, this._lookAtVector, right);
         if (right.lengthSquared() < Epsilon) {
-            // Looking straight down (or up) - use quaternion rotation to compute horiz
+            // horiz = north * cos(yaw) + east * sin(yaw)
+            // Using tempEast directly ensures handedness is taken into account
             const horiz = TmpVectors.Vector3[11];
-            const yawScale = this._scene.useRightHandedSystem ? 1 : -1;
-            const yawQuat = TmpVectors.Quaternion[1];
-            Quaternion.RotationAxisToRef(this._tempUp, this._yaw * yawScale, yawQuat);
-            this._tempNorth.rotateByQuaternionToRef(yawQuat, horiz);
+            const t1 = TmpVectors.Vector3[12];
+            horiz
+                .copyFrom(this._tempNorth)
+                .scaleInPlace(Math.cos(this._yaw))
+                .addInPlace(t1.copyFrom(this._tempEast).scaleInPlace(Math.sin(this._yaw)));
             // right = cross(horiz, lookAt)
             Vector3.CrossToRef(horiz, this._lookAtVector, right);
         }
@@ -297,6 +306,7 @@ export class GeospatialCamera extends Camera {
         const zoomDistance = Vector3Distance(this.position, destination) * distanceScale;
         const newRadius = this._getCenterAndRadiusFromZoomToPoint(destination, zoomDistance, this._tempCenter);
         await this.flyToAsync(undefined, undefined, newRadius, this._tempCenter, durationMs, easingFn, centerHopScale);
+        !this.isDisposed() && this._recalculateCenter(false, true /** force */);
     }
 
     private _limits: GeospatialLimits;
@@ -483,12 +493,12 @@ export class GeospatialCamera extends Camera {
 
     private _wasCenterMovingLastFrame = false;
 
-    private _recalculateCenter(isCenterMoving: boolean) {
+    private _recalculateCenter(isCenterMoving: boolean, forceRecalculate: boolean = false): void {
         const shouldRecalculateCenterAfterMove = this._wasCenterMovingLastFrame && !isCenterMoving;
         this._wasCenterMovingLastFrame = isCenterMoving;
 
         // Wait until movement impacting center is complete to avoid wasted raycasting
-        if (shouldRecalculateCenterAfterMove) {
+        if (shouldRecalculateCenterAfterMove || forceRecalculate) {
             const newCenter = this.movement.pickAlongVector(this._lookAtVector);
             if (newCenter?.pickedPoint) {
                 // Direction from new center to origin
@@ -557,7 +567,18 @@ export class GeospatialCamera extends Camera {
     override detachControl(): void {
         this.inputs.detachElement();
     }
+
+    /**
+     * Gets the class name of the camera.
+     * @returns the class name
+     */
+    public override getClassName(): string {
+        return "GeospatialCamera";
+    }
 }
+
+// Register Class Name
+RegisterClass("BABYLON.GeospatialCamera", GeospatialCamera);
 
 /**
  * Compute the lookAt direction vector from yaw and pitch angles at a given center point.
@@ -573,21 +594,22 @@ export function ComputeLookAtFromYawPitchToRef(yaw: number, pitch: number, cente
     const east = TmpVectors.Vector3[0];
     const north = TmpVectors.Vector3[1];
     const up = TmpVectors.Vector3[2];
-    ComputeLocalBasisToRefs(center, east, north, up);
+    ComputeLocalBasisToRefs(center, east, north, up, useRightHandedSystem);
 
     const sinPitch = Math.sin(pitch);
     const cosPitch = Math.cos(pitch);
 
-    // Use quaternion rotation to compute horiz = rotate(north, up, yaw * yawScale)
-    const yawScale = useRightHandedSystem ? 1 : -1;
-    const yawQuat = TmpVectors.Quaternion[0];
-    Quaternion.RotationAxisToRef(up, yaw * yawScale, yawQuat);
-
+    // horiz = north * cos(yaw) + east * sin(yaw)
+    // Handedness is taken into account when defining east vector via ComputeLocalBasisToRefs.
     const horiz = TmpVectors.Vector3[3];
-    north.rotateByQuaternionToRef(yawQuat, horiz);
+    const t1 = TmpVectors.Vector3[4];
+    horiz
+        .copyFrom(north)
+        .scaleInPlace(Math.cos(yaw))
+        .addInPlace(t1.copyFrom(east).scaleInPlace(Math.sin(yaw)));
 
     // lookAt = horiz * sinPitch - up * cosPitch
-    const t2 = TmpVectors.Vector3[4];
+    const t2 = TmpVectors.Vector3[5];
     result.copyFrom(horiz).scaleInPlace(sinPitch).addInPlace(t2.copyFrom(up).scaleInPlace(-cosPitch));
     return result.normalize();
 }
@@ -607,10 +629,10 @@ export function ComputeYawPitchFromLookAtToRef(lookAt: Vector3, center: Vector3,
     const east = TmpVectors.Vector3[6];
     const north = TmpVectors.Vector3[7];
     const up = TmpVectors.Vector3[8];
-    ComputeLocalBasisToRefs(center, east, north, up);
+    ComputeLocalBasisToRefs(center, east, north, up, useRightHandedSystem);
 
     // lookAt = horiz*sinPitch - up*cosPitch
-    // where horiz = rotate(north, up, yaw * yawScale) via quaternion
+    // where horiz = north*cos(yaw) + east*sin(yaw)
     //
     // The vertical component of lookAt (along up) gives us cosPitch:
     // lookAt · up = -cosPitch
@@ -639,15 +661,12 @@ export function ComputeYawPitchFromLookAtToRef(lookAt: Vector3, center: Vector3,
     // horiz = lookHorizontal / sinPitch
     const horiz = lookHorizontal.scaleInPlace(1 / sinPitch);
 
-    // The quaternion rotation produces: horiz = rotate(north, up, angle)
-    // This is equivalent to: horiz = north*cos(angle) + cross(up, north)*sin(angle) = north*cos(angle) - east*sin(angle)
-    // (since cross(up, north) = -east in our basis)
-    // So: cosYaw = horiz · north, sinYaw = -(horiz · east)
+    // From the forward formula: horiz = North*cos(yaw) + East*sin(yaw)
+    // So: cosYaw = horiz · north, sinYaw = horiz · east
     const cosYaw = Vector3Dot(horiz, north);
-    const sinYaw = -Vector3Dot(horiz, east);
+    const sinYaw = Vector3Dot(horiz, east);
 
-    const yawScale = useRightHandedSystem ? 1 : -1;
-    result.x = Math.atan2(sinYaw, cosYaw) * yawScale;
+    result.x = Math.atan2(sinYaw, cosYaw);
     result.y = pitch;
     return result;
 }

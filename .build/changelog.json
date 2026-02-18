@@ -1,7 +1,1176 @@
 {
-    "fromTag": "8.50.0",
+    "fromTag": "8.51.1",
     "changelog": {
-        "8.50.0": [],
+        "8.51.1": [
+            {
+                "pr": "17892",
+                "title": "Havok + FloatingOrigin: Dynamic re-regioning",
+                "description": "Currently if two objects are positioned far away from one another and are in separate regions, they cannot collide even if manually changing their positions or physics causes them to drift towards eachother. \r\n\r\nThis change solves both cases -- whether an object is 'teleported' to a new location (note that in order for this to work the user would have to enablePrestep, move body, then re-disablePreStep) or if the physics simulation causes them to drift towards one another \r\n\r\nNote that this implementation cleans up empty regions so we dont have unnecessarily large number of regions\r\n\r\nTested via /#7N17MT#20 -- launch ball tests the physics drift collision while move box swaps the boxes and tests the 'teleport' scenario\r\n\r\n#17451 ",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/core/src/Physics/v2/Plugins/havokPlugin.ts"
+                ],
+                "tags": [
+                    "rendering engine",
+                    "physics",
+                    "new feature"
+                ]
+            },
+            {
+                "pr": "17885",
+                "title": "Animations: add support for animation retargeting",
+                "description": "Also in this PR:\r\n* added the possibility to clone animation keys when cloning an animation\r\n* added helper methods adding to the `Skeleton` class (`findBoneFromLinkedTransformNode`, `findBoneFromLinkedTransformNodeName` and `CreateSkeletonFromTransformNodeHierarchy`)\r\n* fixed local axes not showing up when enabling the option in the skeleton viewer debug component\r\n* fixed DISPLAY_SPHERES mode not working in skeleton viewer\r\n* added the possibility to choose which camera to use with the gizmo manager in Inspector V2\r\n\r\nWriting the documentation is the next step on my list!\r\n\r\nHere's a screenshot of the change to Inspector v2:\r\n<img width=\"584\" height=\"300\" alt=\"image\" src=\"https://github.com/user-attachments/assets/411641b4-a638-40c4-98c7-ef59f3cfc0eb\" />\r\n\r\nAutomatic is the default (existing) behavior, which is to use the value of `scene.activeCamera` at the time the gizmos need to use a camera.\r\n",
+                "author": {
+                    "name": "Popov72",
+                    "url": "https://github.com/Popov72"
+                },
+                "files": [
+                    "packages/dev/core/src/Animations/animation.ts",
+                    "packages/dev/core/src/Animations/animationGroup.ts",
+                    "packages/dev/core/src/Animations/animatorAvatar.ts",
+                    "packages/dev/core/src/Animations/index.ts",
+                    "packages/dev/core/src/Bones/index.ts",
+                    "packages/dev/core/src/Bones/skeleton.functions.ts",
+                    "packages/dev/core/src/Bones/skeleton.ts",
+                    "packages/dev/core/src/Debug/skeletonViewer.ts",
+                    "packages/dev/core/src/Morph/morphTarget.ts",
+                    "packages/dev/core/src/Morph/morphTargetManager.ts",
+                    "packages/dev/inspector-v2/src/components/gizmoToolbar.tsx",
+                    "packages/dev/inspector-v2/src/services/gizmoService.ts",
+                    "packages/dev/inspector-v2/src/services/gizmoToolbarService.tsx"
+                ],
+                "tags": [
+                    "inspector",
+                    "animations",
+                    "new feature"
+                ]
+            },
+            {
+                "pr": "17887",
+                "title": "Gaussian Splatting GPU Picking",
+                "description": "<img width=\"1318\" height=\"1392\" alt=\"image\" src=\"https://github.com/user-attachments/assets/fcc5b17a-0341-4649-97a5-13aafc9b80dd\" />\r\n\r\nhttps://playground.babylonjs.com/?snapshot=refs/pull/17887/merge#3LNCE6#36",
+                "author": {
+                    "name": "spsDrop",
+                    "url": "https://github.com/spsDrop"
+                },
+                "files": [
+                    "packages/dev/core/src/Collisions/gpuPicker.ts",
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingGpuPickingMaterialPlugin.ts",
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingMaterial.ts",
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingSolidColorMaterialPlugin.ts",
+                    "packages/dev/core/src/Materials/index.ts",
+                    "packages/dev/core/src/Meshes/GaussianSplatting/gaussianSplattingMesh.ts"
+                ],
+                "tags": [
+                    "Gaussian Splatting"
+                ]
+            }
+        ],
+        "8.51.2": [
+            {
+                "pr": "17904",
+                "title": "Moving properties to an extra object to avoid V8 de-optimization",
+                "description": "There was an issue that at some point by adding properties to particle.ts, we made the object too big to be optimized by V8, causing a significant FPS drop on big systems.\r\n\r\nThis PR just puts the internal properties of particles inside a class to reduce the number of direct properties in the class itself, so V8 will still optimize it.\r\n\r\nPG to test: #40DI3L#5",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/boxShapeBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/coneShapeBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/customShapeBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/cylinderShapeBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/emitters.functions.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/meshShapeBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/pointShapeBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Emitters/sphereShapeBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Update/basicPositionUpdateBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/Update/updateNoiseBlock.ts",
+                    "packages/dev/core/src/Particles/Node/Blocks/particleLocalVariableBlock.ts",
+                    "packages/dev/core/src/Particles/Node/nodeParticleBuildState.ts",
+                    "packages/dev/core/src/Particles/particle.ts",
+                    "packages/dev/core/src/Particles/particleSystem.ts",
+                    "packages/dev/core/src/Particles/thinParticleSystem.function.ts",
+                    "packages/dev/core/src/Particles/thinParticleSystem.ts"
+                ],
+                "tags": [
+                    "bug",
+                    "particles"
+                ]
+            },
+            {
+                "pr": "17902",
+                "title": "Inspector v2: Fix es6 package and other bug fixes",
+                "description": "This PR has three Inspector v2 bug fixes:\r\n1. When we added gif capture support, we didn't get the es6 bundler settings correct. We silenced a warning that was actually legit. The correct fix is to use a bundler plugin that effectively converts a consumed umd bundle (the external gif lib) to esm. Without this, you get a runtime error and the tools pane doesn't work.\r\n2. Scene Explorer tries to read `scene.mainSoundTrack.soundCollection`, but `scene.mainSoundTrack` is `undefined` unless the audioSceneComponent is imported and its side effects assigns a value to `scene.mainSoundTrack`. This means without the side effect, you actually just get a crash. Now the code is conditional, and hooks the `scene._mainSoundTrack` property to see when it becomes valid (or changes).\r\n3. Scene Explorer had a couple direct references to `entity.uniqueId` instead of `GetEntityId(entity)`, which in the case of \"synthetic unique ids\" (like for `Sound`), would return undefined, which results in an error in the console and can break tree virtualization.",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "package-lock.json",
+                    "packages/dev/inspector-v2/src/components/scene/sceneExplorer.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/soundExplorerService.tsx",
+                    "packages/dev/inspector-v2/test/app/index.tsx",
+                    "packages/public/@babylonjs/inspector-v2/package.json",
+                    "packages/public/@babylonjs/inspector-v2/rollup.config.lib.mjs"
+                ],
+                "tags": [
+                    "bug",
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17895",
+                "title": "More linting warnings removed",
+                "description": null,
+                "author": {
+                    "name": "deltakosh",
+                    "url": "https://github.com/deltakosh"
+                },
+                "files": [
+                    "packages/dev/core/src/Materials/Background/backgroundMaterial.ts",
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingMaterial.ts",
+                    "packages/dev/core/src/Materials/GreasedLine/greasedLinePluginMaterial.ts",
+                    "packages/dev/core/src/Materials/GreasedLine/greasedLinePluginMaterialShadersGLSL.ts",
+                    "packages/dev/core/src/Materials/GreasedLine/greasedLinePluginMaterialShadersWGSL.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/clipPlanesBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/currentScreenBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/depthSourceBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/fogBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/imageSourceBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/lightBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/reflectionTextureBaseBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/reflectionTextureBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/sceneDepthBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/smartFilterTextureBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Dual/textureBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/TBNBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/ambientOcclusionBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/fragmentOutputBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/heightToNormalBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/imageProcessingBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/perturbNormalBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/screenSizeBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/screenSpaceBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Fragment/twirlBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/GaussianSplatting/splatReaderBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Input/inputBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Input/prePassTextureBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/anisotropyBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/clearCoatBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/iridescenceBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/reflectionBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/refractionBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/sheenBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/PBR/subSurfaceBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Particle/particleTextureBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Teleport/teleportInBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Teleport/teleportOutBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Vertex/bonesBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Vertex/instancesBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Vertex/lightInformationBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/Vertex/morphTargetsBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/clampBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/cloudBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/colorMergerBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/conditionalBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/curveBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/customBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/debugBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/fresnelBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/gradientBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/loopBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/matrixBuilderBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/meshAttributeExistsBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/pannerBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/remapBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/rotate2dBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/transformBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/triPlanarBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/trigonometryBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/vectorMergerBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/viewDirectionBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/waveBlock.ts",
+                    "packages/dev/core/src/Materials/Node/Blocks/worleyNoise3DBlock.ts",
+                    "packages/dev/core/src/Materials/Node/nodeMaterial.ts",
+                    "packages/dev/core/src/Materials/Node/nodeMaterialBlock.ts",
+                    "packages/dev/core/src/Materials/Node/nodeMaterialBlockConnectionPoint.ts"
+                ],
+                "tags": [
+                    "skip changelog"
+                ]
+            },
+            {
+                "pr": "17901",
+                "title": "Inspector v2: Reduce perf overhead in default idle state",
+                "description": "In response to some of the forum discussion on Inspector v2 perf overhead (https://forum.babylonjs.com/t/introducing-inspector-v2/60937/152), I did some more investigation and found a couple more things that have a small amount of overhead:\r\n\r\n1. The stats pane (including the Performance Viewer) instantiates several instances of `SceneInstrumentation`, plus register with other per-frame observables. This adds some per-frame overhead.\r\n2. The debug pane hooks a bunch of `Scene` properties. Since we don't have observables for these, it hooks the properties through our property instrumentation helpers, which replaces the original property with a new one to create a \"synthetic\" observable when the property setter is called, but this also means replacing the getter, which adds one more layer in the call stack. From what I can see, this one is extremely tiny overhead, but it is non-zero.\r\n\r\nIn the default idle Inspector v2 state (where neither the stats pane nor the debug pane are visible), you still pay the perf overhead for them. This is because Inspector v2 keeps all panes mounted so they don't lose their state when switching between tabs. This is particularly useful for Scene Explorer and Properties, but less useful for the other panes (since there isn't a lot of user effort that goes into getting the other panes into a particular visual state). Given this, the change I'm making in this PR is to make the stay-mounted-when-not-visible behavior opt-in, and Scene Explorer and Properties are the only panes that opt in. This means in the default/idle state, there are no hooked observables or properties that are touched on a per-frame bases.\r\n\r\nWith these changes, plus these two:\r\nhttps://github.com/BabylonJS/Babylon.js/pull/17893/changes#diff-2e00c9c08d421d1d47f3292f08211caf984e42d948b70b4ed633597411bf36abR25-R26\r\nhttps://github.com/BabylonJS/Babylon.js/pull/17893/changes#diff-ce43142078840ddae7d6a16fc2f50227432422fb7eeedb65577281a0fd1dc2e5R37-R40\r\n\r\nI see no measurable difference in frame rate even with the `--disable-gpu-vsync --disable-frame-rate-limit` Chrome settings that @Popov72 mentioned in the forum thread.",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/services/panes/properties/propertiesService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/sceneExplorerService.tsx",
+                    "packages/dev/inspector-v2/src/services/shellService.tsx"
+                ],
+                "tags": [
+                    "bug",
+                    "inspector"
+                ]
+            }
+        ],
+        "8.51.0": [
+            {
+                "pr": "17893",
+                "title": "Inspector v2: Scene Explorer entity commands for associated tool (e.g. NME, NGE, GUI Editor, etc.)",
+                "description": "This PR mostly just adds Scene Explorer commands for editing entities in their associated tool: NME, NGE, NPE, NRGE, and GUI Editor. I added new files with helpers for launching each of the editors that is used from both the properties pane buttons and scene explorer commands.\r\n\r\n<img width=\"520\" height=\"283\" alt=\"image\" src=\"https://github.com/user-attachments/assets/8de6908b-6a04-4b5d-8e12-aef8e0121469\" />\r\n\r\nI also included a couple other tiny changes where we just poll for FPS from engine every 250ms rather than every frame as this is the only thing I could find happening on a per frame basis in the default Inspector state, so I want to see if this helps with https://forum.babylonjs.com/t/introducing-inspector-v2/60937/149",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/components/properties/frameGraph/frameGraphProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/materials/nodeMaterialProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/nodes/meshProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/particles/systemProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/scene/sceneExplorer.tsx",
+                    "packages/dev/inspector-v2/src/components/stats/statsPane.tsx",
+                    "packages/dev/inspector-v2/src/misc/nodeGeometryEditor.ts",
+                    "packages/dev/inspector-v2/src/misc/nodeMaterialEditor.ts",
+                    "packages/dev/inspector-v2/src/misc/nodeParticleEditor.ts",
+                    "packages/dev/inspector-v2/src/misc/nodeRenderGraphEditor.ts",
+                    "packages/dev/inspector-v2/src/services/miniStatsService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/defaultSectionsMetadata.ts",
+                    "packages/dev/inspector-v2/src/services/panes/scene/frameGraphExplorerService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/guiExplorerService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/materialExplorerService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/nodeExplorerService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/particleSystemExplorerService.tsx"
+                ],
+                "tags": [
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17891",
+                "title": "Simplify handedness calculation",
+                "description": "Rather than needing to explicitly swap yaw based on handedness in various places throughout the geospatialcamera calculations, I am consolidating the handedness notion into the computation of local basis. This means that any time a localbasis is created, east is pointing to geographic east (positive Y when righthanded, negative Y when lefthanded) .\r\n\r\nThat lets us remove the yawScale multiplier sprinkled throughout the code. \r\nAlso returning to manual rotating around axis rather than quaternion because we can't swap the crossproduct order in the rotationaxis function. \r\n\r\nTested with /#VQDXMU",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/core/src/Cameras/geospatialCamera.ts",
+                    "packages/dev/core/src/Cameras/geospatialCameraMovement.ts",
+                    "packages/dev/core/test/unit/Cameras/geospatialCamera.test.ts"
+                ],
+                "tags": [
+                    "camera"
+                ]
+            },
+            {
+                "pr": "17890",
+                "title": "Add link to created entity in QuickCreation tool",
+                "description": "- Add link to the newly created entity after creation\r\n<img width=\"199\" height=\"472\" alt=\"image\" src=\"https://github.com/user-attachments/assets/d636766d-3a22-4a26-92ee-a801c8ef3337\" />\r\n\r\n- Add toast confirming creation or notifying of failure\r\n<img width=\"208\" height=\"64\" alt=\"image\" src=\"https://github.com/user-attachments/assets/0b3c08aa-d1ea-43f8-b60f-2437caa5a342\" />\r\n\r\n- Close popover after clicking create\r\n- Refactor quickCreateItem to accept label, creation function, and any children that should live in the settings popover , that way the toast and creation logic can be centralized without each callsite needing to handle it",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/components/properties/linkToEntityPropertyLine.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/cameras.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/frameGraphs.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/lights.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/materials.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/meshes.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/particles.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/quickCreateLayout.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/quickCreateToolsService.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/renderingPipelines.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/settingsPopover.tsx",
+                    "packages/dev/inspector-v2/src/extensions/quickCreate/spriteManagers.tsx",
+                    "packages/dev/sharedUiComponents/src/fluent/primitives/toast.tsx"
+                ],
+                "tags": [
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17889",
+                "title": "Incorporate copy button into the 'edit' mode used for pinning/hiding",
+                "description": "This creates a more consistent UX so even if disableCopy is true, the copy button is still accessible in edit mode or ctrl mode ",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/sharedUiComponents/src/fluent/hoc/propertyLines/propertyLine.tsx",
+                    "packages/dev/sharedUiComponents/src/fluent/primitives/accordion.tsx"
+                ],
+                "tags": [
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17888",
+                "title": "Adding the last visual tests for particles",
+                "description": "Adding the last visual tests for particles (regular and NPE).",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-attractors.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-flowmaps-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-flowmaps.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-helper-fire.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-helper-smoke.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-helper-sun.png",
+                    "packages/tools/tests/test/visualization/config.json"
+                ],
+                "tags": [
+                    "particles",
+                    "tests"
+                ]
+            },
+            {
+                "pr": "17884",
+                "title": "Inspector v2: Settings service cleanup",
+                "description": "This PR addresses the following issues with how settings are handled in Inspector v2:\r\n- The settings APIs have bifurcated into the settings API for react components and the settings API for services. They are only related in that they both use local storage.\r\n- Using service-based settings in React components is a hassle because you have to pass through the settings service, while settings that are only used in React components do not rely on the settings service, which is inconsistent and confusing (knowing which one to use is unclear).\r\n- There is not a good way for services to introduce new settings that can be accessed by other services. The exposed settings are basically all hardcoded in `ISettingContext`.\r\n\r\nThis change fixes these problems and unifies the settings API(s) with the following concepts:\r\n- `SettingDescriptor` - this is simply a unique setting key/id plus the default value for the setting. Any service can create and expose these, and there are some global defaults that are built-in.\r\n- `SettingsStore` - this is a class that reads and writes settings (given a `SettingDescriptor`) and fires an observable when a setting value changes. It is created with a namespace string that helps aggregate all the Inspector settings so that when Inspector is used in an arbitrary webapp, it's easy to distinguish Inspector local storage from app local storage.\r\n- `SettingsService` - this is just the `SettingsStore` exposed as a service to other services.\r\n- `SettingsContext` - this is a React context that exposes the `SettingsStore` instance so React components can access settings without needing a SettingsService passed through.\r\n- `useSetting` - this is a simple hook on top of the `SettingsContext` for reading/writing setting values, and triggering a re-render when a setting changes.\r\n\r\nThe rest of the changes are mostly just using these APIs. Most of them are straight forward, but the theme ones were a bit more heavily changed:\r\n- `ThemeService` - this had some weird backwards dependencies (service depending on hooks), but now is reworked a bit so it is just directly on top of the `SettingsService`.\r\n- `useThemeMode` and `useTheme` - these share some logic (`ThemeResolver`) with `ThemeService`, but still expose theme info to React components.\r\n\r\nI also ran into a handful of random bugs that I fixed in this PR:\r\n- Any change to a child in the ExtensibleAccordion would trigger a re-render of the entire ExtensibleAccordion. Fixing this requires improved caching of the child element wrapper components.\r\n- Scene explorer root entities were being filtered on `reservedDataStore.hidden` in the wrong place, which made it possible for empty scene explorer sections to be displayed.\r\n- The recently added `HighlightService` has been updated to put the `SelectionOutlineLayer` in the utility layer scene instead of the main scene.",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/dev/core/src/Misc/dataStorage.ts",
+                    "packages/dev/inspector-v2/src/components/extensibleAccordion.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/cameras/arcRotateCameraProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/cameras/cameraProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/cameras/freeCameraProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/cameras/geospatialCameraProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/materials/skyMaterialProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/sprites/spriteProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/textures/cubeTextureProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/textures/textureProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/properties/transformProperties.tsx",
+                    "packages/dev/inspector-v2/src/components/scene/sceneExplorer.tsx",
+                    "packages/dev/inspector-v2/src/components/theme.tsx",
+                    "packages/dev/inspector-v2/src/components/uxContextProvider.tsx",
+                    "packages/dev/inspector-v2/src/contexts/settingsContext.ts",
+                    "packages/dev/inspector-v2/src/extensibility/extensionManager.ts",
+                    "packages/dev/inspector-v2/src/hooks/resourceHooks.ts",
+                    "packages/dev/inspector-v2/src/hooks/settingsHooks.ts",
+                    "packages/dev/inspector-v2/src/hooks/teachingMomentHooks.ts",
+                    "packages/dev/inspector-v2/src/hooks/themeHooks.ts",
+                    "packages/dev/inspector-v2/src/index.ts",
+                    "packages/dev/inspector-v2/src/inspector.tsx",
+                    "packages/dev/inspector-v2/src/modularTool.tsx",
+                    "packages/dev/inspector-v2/src/services/globalSettings.ts",
+                    "packages/dev/inspector-v2/src/services/highlightService.ts",
+                    "packages/dev/inspector-v2/src/services/panes/properties/cameraPropertiesService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/properties/materialPropertiesService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/properties/spritePropertiesService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/properties/texturePropertiesService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/properties/transformPropertiesService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/settingsService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/statsService.tsx",
+                    "packages/dev/inspector-v2/src/services/pickingService.tsx",
+                    "packages/dev/inspector-v2/src/services/selectionService.tsx",
+                    "packages/dev/inspector-v2/src/services/settingsContext.ts",
+                    "packages/dev/inspector-v2/src/services/settingsStore.ts",
+                    "packages/dev/inspector-v2/src/services/shellService.tsx",
+                    "packages/dev/inspector-v2/src/services/shellSettingsService.tsx",
+                    "packages/dev/inspector-v2/src/services/themeSelectorService.tsx",
+                    "packages/dev/inspector-v2/src/services/themeService.ts"
+                ],
+                "tags": [
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17879",
+                "title": "Particle modes tests",
+                "description": "Add visual tests for particles for:\r\n- ramps and remaps\r\n- billboard mode\r\n- blend mode",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-add-blend.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-billboard-false.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-billboard-y.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-multiply-blend.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-ramp-blend.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-ramp-gradient-remap-alpha.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-ramp-gradient-remap.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-ramp-gradient.png",
+                    "packages/tools/tests/test/visualization/config.json"
+                ],
+                "tags": [
+                    "particles",
+                    "tests"
+                ]
+            },
+            {
+                "pr": "17880",
+                "title": "Add solid color Gaussian splatting material plugin",
+                "description": "Adds basic material plugin support to splat material and solid color plugin. This should only be used with compound meshes\r\n\r\n<img width=\"1501\" height=\"1325\" alt=\"image\" src=\"https://github.com/user-attachments/assets/130b4244-79e3-4b5a-9205-e66f4ce514e6\" />\r\n\r\nhttps://playground.babylonjs.com/?snapshot=refs/pull/17880/merge#3LNCE6#26",
+                "author": {
+                    "name": "spsDrop",
+                    "url": "https://github.com/spsDrop"
+                },
+                "files": [
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingMaterial.ts",
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingSolidColorMaterialPlugin.ts",
+                    "packages/dev/core/src/Materials/index.ts",
+                    "packages/dev/core/src/Shaders/gaussianSplatting.fragment.fx",
+                    "packages/dev/core/src/Shaders/gaussianSplatting.vertex.fx",
+                    "packages/dev/core/src/ShadersWGSL/gaussianSplatting.fragment.fx",
+                    "packages/dev/core/src/ShadersWGSL/gaussianSplatting.vertex.fx"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17886",
+                "title": "Fix double-count bug",
+                "description": "The shaderCompilationTimeCounter would call `fetchNewFrame()`, which increments count, both before and after shader compilation. This should fix it. See playground for repro of the issue: https://playground.babylonjs.com/#F7C6DP#10",
+                "author": {
+                    "name": "alexchuber",
+                    "url": "https://github.com/alexchuber"
+                },
+                "files": [
+                    "packages/dev/core/src/Instrumentation/engineInstrumentation.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17883",
+                "title": "Simplify placeholder regex further",
+                "description": "The placeholders being searched for are on lines by themselves. That allows us to further simplify the regex. Now it will search for the placeholders that begin (and end) a line.\r\n\r\nValidated with `npm run test:escheck` on the umd build.",
+                "author": {
+                    "name": "kircher1",
+                    "url": "https://github.com/kircher1"
+                },
+                "files": [
+                    "packages/dev/addons/src/atmosphere/diffuseSkyIrradianceLut.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17882",
+                "title": "Stop and cleanup underlying WebAudio microphone stream node on dispose",
+                "description": "Tested with PG: https://playground.babylonjs.com/#OYZMZZ",
+                "author": {
+                    "name": "docEdub",
+                    "url": "https://github.com/docEdub"
+                },
+                "files": [
+                    "packages/dev/core/src/AudioV2/webAudio/webAudioSoundSource.ts"
+                ],
+                "tags": [
+                    "bug",
+                    "audio"
+                ]
+            },
+            {
+                "pr": "17872",
+                "title": "Gaussian Splatting raise limit for number of compound splat parts",
+                "description": null,
+                "author": {
+                    "name": "spsDrop",
+                    "url": "https://github.com/spsDrop"
+                },
+                "files": [
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingMaterial.ts",
+                    "packages/dev/core/src/Meshes/GaussianSplatting/gaussianSplattingMesh.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17858",
+                "title": "3MF Support",
+                "description": "# 3MF Exporter for Babylon.js\r\n\r\nThis PR introduces a 3MF exporter designed around Babylon.js rendering concepts: Meshes, SubMeshes, and instances. Since 3MF targets production workflows (slicers and printers), it supports concepts such as components and part numbers that do not exist in Babylon.js. Because of that mismatch, the exporter must make a few pragmatic choices to map Babylon.js content into a valid and useful 3MF package.\r\n\r\nThe key principle is that the serializer stays predictable and \"dumb\": it does not guess production intent. Instead, users are expected to define the behaviors they need (metadata, instance export, etc.) before calling the exporter. This is important because 3MF is versatile and downstream consumers (slicers, printers) vary widely in what they support.\r\n\r\nMaterial and color handling can also depend heavily on the target ecosystem. This PR focuses on core geometry and structure first; material and color extensions can be expanded later once we have clearer feedback on real-world compatibility.\r\n\r\n## Metadata\r\n\r\nYou can inject metadata through the serializer options. Metadata entries are defined as name/value pairs. 3MF defines a set of well-known metadata names, including:\r\n\r\n- Title: A title for the 3MF document\r\n- Designer: A name for a designer of this document\r\n- Description: A description of the document\r\n- Copyright: A copyright associated with this document\r\n- LicenseTerms: License information associated with this document\r\n- Rating: An industry rating associated with this document\r\n- CreationDate: The date this document was created by a source application\r\n- ModificationDate: The date this document was last modified\r\n- Application: The name of the source application that originally created this document\r\n\r\nThe exporter does not enforce or restrict these values: you can provide any of the known keys above, as well as any additional metadata your workflow requires.\r\n\r\n## SubMeshes\r\n\r\nIn Babylon.js, a SubMesh splits a single Mesh into smaller ranges so each range can be rendered separately (often with different materials) while still remaining a single Mesh object. Babylon.js also creates a default SubMesh covering the full mesh when none are explicitly defined.\r\n\r\nTo preserve this structure for production export, the serializer processes SubMeshes and exports each SubMesh as its own 3MF mesh object. Concretely:\r\n\r\n- If a Mesh contains N SubMeshes, the exporter writes N 3MF mesh objects.\r\n- This creates a clear mapping where each exported object can later receive its own material and/or color assignment (which is the main reason SubMeshes exist in Babylon.js).\r\n\r\n## Instances and Thin Instances\r\n\r\nInstances raise two separate cases: standard InstancedMesh objects, and thin instances.\r\n\r\n1. InstancedMesh  \r\n   Instanced meshes are explicit objects in the scene graph, so they can be passed directly to the exporter. This is the chosen behavior: users can provide Mesh and InstancedMesh objects to the serializer, and they will be exported accordingly.\r\n\r\n2. Thin instances  \r\n   Thin instances are tightly coupled to the source Mesh and do not exist as independent scene objects. To keep the API simple and predictable, thin instances are NOT yest exported\r\n\r\nAs a general rule, the serializer avoids hidden logic. Any functional rules (selection, grouping, filtering) should be applied before calling it.\r\n\r\n## Usage\r\n\r\nInside the `3MF` directory, the `core` folder is fully independent from Babylon.js. It defines the utilities and data model required to build a valid 3MF document/package.\r\n\r\nThe Babylon.js integration is implemented by `.BjsThreeMfSerializer`, which specializes the abstract serializer for Babylon types, and by a `ThreeMf` helper with small convenience utilities.\r\n\r\n### Entry point\r\n\r\nThe main entry point is:\r\n\r\n```ts\r\npublic async serializeAsync(\r\n  sink: (err: any, chunk: Uint8Array, final: boolean) => void,\r\n  ...meshes: Array<T>\r\n): Promise<void> { ... }\r\n```\r\n\r\nThe most important parameter (besides the meshes) is the `sink` function. It receives the binary output as chunks and can forward them to any destination: in-memory buffers, blobs, file streams, or a network transport.\r\n\r\n### Convenience helper\r\n\r\nA convenience helper is provided to collect the output into memory:\r\n\r\n```ts\r\nThreeMf.SerializeToMemoryAsync<T>(\r\n  s: I3mfSerializer<T>,\r\n  ...meshes: Array<T>\r\n): Promise<Uint8Array | undefined>;\r\n```\r\n\r\nFor Babylon.js, `T` is `(Mesh | InstancedMesh)`.\r\n\r\n### Minimal example\r\n\r\n```ts\r\nasync function downloadFileImpl(source, filename = \"export.3mf\") {\r\n  const res = await BABYLON.ThreeMf.SerializeToMemoryAsync(\r\n    new BABYLON.BjsThreeMfSerializer({ exportInstances: true }),\r\n    ...source\r\n  );\r\n\r\n  const blob = new Blob([res], { type: \"model/3mf\" });\r\n  const url = URL.createObjectURL(blob);\r\n\r\n  try {\r\n    const a = document.createElement(\"a\");\r\n    a.href = url;\r\n    a.download = filename;\r\n    a.rel = \"noopener\";\r\n    document.body.appendChild(a);\r\n    a.click();\r\n    a.remove();\r\n  } finally {\r\n    URL.revokeObjectURL(url);\r\n  }\r\n}\r\n```\r\n",
+                "author": {
+                    "name": "pandaGaume",
+                    "url": "https://github.com/pandaGaume"
+                },
+                "files": [
+                    "packages/dev/serializers/src/3MF/3mfSerializer.configuration.ts",
+                    "packages/dev/serializers/src/3MF/3mfSerializer.ts",
+                    "packages/dev/serializers/src/3MF/core/index.ts",
+                    "packages/dev/serializers/src/3MF/core/model/3mf.builder.ts",
+                    "packages/dev/serializers/src/3MF/core/model/3mf.interfaces.ts",
+                    "packages/dev/serializers/src/3MF/core/model/3mf.opc.interfaces.ts",
+                    "packages/dev/serializers/src/3MF/core/model/3mf.opc.ts",
+                    "packages/dev/serializers/src/3MF/core/model/3mf.serializer.ts",
+                    "packages/dev/serializers/src/3MF/core/model/3mf.ts",
+                    "packages/dev/serializers/src/3MF/core/model/3mf.types.ts",
+                    "packages/dev/serializers/src/3MF/core/model/index.ts",
+                    "packages/dev/serializers/src/3MF/core/xml/index.ts",
+                    "packages/dev/serializers/src/3MF/core/xml/xml.builder.bytes.ts",
+                    "packages/dev/serializers/src/3MF/core/xml/xml.builder.string.ts",
+                    "packages/dev/serializers/src/3MF/core/xml/xml.builder.ts",
+                    "packages/dev/serializers/src/3MF/core/xml/xml.interfaces.ts",
+                    "packages/dev/serializers/src/3MF/core/xml/xml.serializer.format.ts",
+                    "packages/dev/serializers/src/3MF/core/xml/xml.serializer.ts",
+                    "packages/dev/serializers/src/3MF/index.ts",
+                    "packages/dev/serializers/src/index.ts",
+                    "packages/lts/serializers/src/legacy/legacy-3mfSerializer.ts",
+                    "packages/lts/serializers/src/legacy/legacy.ts",
+                    "packages/public/umd/babylonjs-serializers/src/3mf.ts",
+                    "packages/public/umd/babylonjs-serializers/webpack.config.js",
+                    "packages/tools/babylonServer/src/serializers/legacy-dev.ts",
+                    "packages/tools/babylonServer/src/serializers/legacy-lts.ts"
+                ],
+                "tags": [
+                    "new feature"
+                ]
+            },
+            {
+                "pr": "17881",
+                "title": "Replace regex that is breaking our `test:escheck` script",
+                "description": "The current regex uses negative lookbehind with alternation and variable-width patterns, which is not valid in Safari/JavaScriptCore.\r\n\r\nThis change replaces the regex with a valid negative lookahead anchored at the start of each line.\r\n\r\nFixes issue introduced by PR https://github.com/BabylonJS/Babylon.js/pull/17855.",
+                "author": {
+                    "name": "docEdub",
+                    "url": "https://github.com/docEdub"
+                },
+                "files": [
+                    "packages/dev/addons/src/atmosphere/diffuseSkyIrradianceLut.ts"
+                ],
+                "tags": [
+                    "skip changelog"
+                ]
+            },
+            {
+                "pr": "17876",
+                "title": "Particles effects",
+                "description": "Adding test for custom particle effects.",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-effects.png",
+                    "packages/tools/tests/test/visualization/config.json"
+                ],
+                "tags": [
+                    "particles",
+                    "tests"
+                ]
+            },
+            {
+                "pr": "17877",
+                "title": "Restore Epsilon to let",
+                "description": null,
+                "author": {
+                    "name": "deltakosh",
+                    "url": "https://github.com/deltakosh"
+                },
+                "files": [
+                    "packages/dev/core/src/Maths/math.constants.ts"
+                ],
+                "tags": [
+                    "skip changelog"
+                ]
+            }
+        ],
+        "8.50.5": [
+            {
+                "pr": "17875",
+                "title": "Adding particle animation tests",
+                "description": "Adds visual tests for particle animations.",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-animations-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-animations.png",
+                    "packages/tools/tests/test/visualization/config.json"
+                ],
+                "tags": [
+                    "particles",
+                    "tests"
+                ]
+            },
+            {
+                "pr": "17857",
+                "title": "Inspector: publicly accessible gizmo state via GizmoService",
+                "description": "Moves gizmo mode state / lifecycle into GizmoService\r\n\r\nAllows clients to sync and manage gizmo independently of the React component. For example, to set an initial gizmo mode, or to read/change gizmo state from external controls. Previously this state lived inside the GizmoToolbar React component, making it inaccessible.\r\n\r\nChanges:\r\n- Gizmo state is accessible via `IGizmoService.gizmoMode` and `IGizmoService.coordinatesMode`\r\n- `GizmoToolbar` becomes a thin UI layer that reads/writes service state via observables\r\n- An `initialGizmoMode` option is added to `InspectorOptions`\r\n- `IGizmoService`, `GizmoMode`, and `GizmoServiceIdentity` are exported from the package index\r\n",
+                "author": {
+                    "name": "marns",
+                    "url": "https://github.com/marns"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/components/gizmoToolbar.tsx",
+                    "packages/dev/inspector-v2/src/index.ts",
+                    "packages/dev/inspector-v2/src/services/gizmoService.ts",
+                    "packages/dev/inspector-v2/src/services/gizmoToolbarService.tsx"
+                ],
+                "tags": [
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17866",
+                "title": "Accordion property pin/hide fixes",
+                "description": "See comment in this PR https://github.com/BabylonJS/Babylon.js/pull/17772#issuecomment-3860129601\r\n\r\n- Fixes \"Hide all\" \r\n- Fixes \"Move up\" behaving inconsistently when hidden items are present\r\n- Fixes empty groups not being hidden\r\n- Also fixes styling so that the pin/hide buttons dont cause propertyline to overflow off the div, and ensures the icons are vertically centered",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/sharedUiComponents/src/fluent/primitives/accordion.contexts.tsx",
+                    "packages/dev/sharedUiComponents/src/fluent/primitives/accordion.tsx"
+                ],
+                "tags": [
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17873",
+                "title": "Playground: disable type checking in ts-loader",
+                "description": "- Disable type checking for ts-loader. Otherwise it type checks all TypeScript code in the bundle, which I believe includes Monaco and other dependencies.\r\n- Add a script that typechecks the Playground code directly with tsc. This uses very little memory and only takes a few seconds to run. It can be added to the build pipeline steps to make sure we still typecheck the Playground code itself.",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/tools/playground/package.json",
+                    "packages/tools/playground/webpack.config.js"
+                ],
+                "tags": [
+                    "build",
+                    "skip changelog"
+                ]
+            },
+            {
+                "pr": "17870",
+                "title": "Lint cleanup",
+                "description": null,
+                "author": {
+                    "name": "deltakosh",
+                    "url": "https://github.com/deltakosh"
+                },
+                "files": [
+                    "packages/dev/core/src/Meshes/Builders/capsuleBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/cylinderBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/decalBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/discBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/groundBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/tiledBoxBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/tiledPlaneBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/torusBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/torusKnotBuilder.ts",
+                    "packages/dev/core/src/Meshes/Builders/tubeBuilder.ts",
+                    "packages/dev/core/src/Meshes/Compression/dracoCompressionWorker.ts",
+                    "packages/dev/core/src/Meshes/Compression/dracoDecoder.ts",
+                    "packages/dev/core/src/Meshes/Compression/dracoDecoder.types.ts",
+                    "packages/dev/core/src/Meshes/Compression/dracoEncoder.ts",
+                    "packages/dev/core/src/Meshes/Compression/meshoptCompression.ts",
+                    "packages/dev/core/src/Meshes/GreasedLine/greasedLineRibbonMesh.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Instances/instantiateBaseBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Instances/instantiateOnFacesBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Instances/instantiateOnVerticesBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Instances/instantiateOnVolumeBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Matrices/scalingBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Matrices/translationBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/aggregatorBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/latticeBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/setColorsBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/setMaterialIDBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/setNormalsBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/setPositionsBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/setTangentsBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Set/setUVsBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/boxBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/capsuleBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/cylinderBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/discBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/gridBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/icoSphereBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/meshBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/planeBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/pointListBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/sphereBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Sources/torusBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Teleport/teleportInBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Teleport/teleportOutBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Textures/geometryTextureBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/Textures/geometryTextureFetchBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/booleanGeometryBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/cleanGeometryBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/conditionBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryClampBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryCollectionBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryCurveBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryEaseBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryInputBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryOptimizeBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryTransformBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/geometryTrigonometryBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/mappingBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/mathBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/mergeGeometryBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/randomBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Blocks/subdivideBlock.ts",
+                    "packages/dev/core/src/Meshes/Node/Interfaces/nodeGeometryTextureData.ts",
+                    "packages/dev/core/src/Meshes/Node/nodeGeometry.ts",
+                    "packages/dev/core/src/Meshes/Node/nodeGeometryBlockConnectionPoint.ts",
+                    "packages/dev/core/src/Meshes/Node/nodeGeometryBuildState.ts",
+                    "packages/dev/core/src/Meshes/WebGL/webGLDataBuffer.ts",
+                    "packages/dev/core/src/Meshes/WebGPU/webgpuDataBuffer.ts",
+                    "packages/dev/core/src/Meshes/abstractMesh.decalMap.ts",
+                    "packages/dev/core/src/Meshes/abstractMesh.ts",
+                    "packages/dev/core/src/Meshes/csg.ts",
+                    "packages/dev/core/src/Meshes/csg2.ts",
+                    "packages/dev/core/src/Meshes/geodesicMesh.ts",
+                    "packages/dev/core/src/Meshes/groundMesh.ts",
+                    "packages/dev/core/src/Meshes/index.ts",
+                    "packages/dev/core/src/Meshes/instancedMesh.ts",
+                    "packages/dev/core/src/Meshes/mesh.ts",
+                    "packages/dev/core/src/Meshes/mesh.vertexData.ts",
+                    "packages/dev/core/src/Meshes/meshSimplification.ts",
+                    "packages/dev/core/src/Meshes/meshSimplificationSceneComponent.ts",
+                    "packages/dev/core/src/Meshes/meshUVSpaceRenderer.ts",
+                    "packages/dev/core/src/Meshes/polygonMesh.ts",
+                    "packages/dev/core/src/Meshes/subMesh.project.ts",
+                    "packages/dev/core/src/Meshes/thinInstanceMesh.ts",
+                    "packages/dev/core/src/Meshes/transformNode.ts"
+                ],
+                "tags": [
+                    "skip changelog"
+                ]
+            },
+            {
+                "pr": "17855",
+                "title": "Remaining WGSL conversion for atmosphere",
+                "description": null,
+                "author": {
+                    "name": "kircher1",
+                    "url": "https://github.com/kircher1"
+                },
+                "files": [
+                    "packages/dev/addons/src/atmosphere/Shaders/diffuseSkyIrradiance.fragment.fx",
+                    "packages/dev/addons/src/atmosphere/ShadersWGSL/ShadersInclude/atmosphereFunctions.fx",
+                    "packages/dev/addons/src/atmosphere/ShadersWGSL/diffuseSkyIrradiance.fragment.fx",
+                    "packages/dev/addons/src/atmosphere/diffuseSkyIrradianceLut.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17874",
+                "title": "isDisposed",
+                "description": "Oops",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/core/src/Cameras/geospatialCamera.ts"
+                ],
+                "tags": [
+                    "skip changelog",
+                    "camera"
+                ]
+            }
+        ],
+        "8.50.4": [
+            {
+                "pr": "17869",
+                "title": "fix dependabot alert",
+                "description": null,
+                "author": {
+                    "name": "sebavan",
+                    "url": "https://github.com/sebavan"
+                },
+                "files": [
+                    "package-lock.json"
+                ],
+                "tags": [
+                    "skip changelog"
+                ]
+            },
+            {
+                "pr": "17861",
+                "title": "Inspector v2: Selection outline/highlight",
+                "description": "This change uses the new `SelectionOutlineLayer` from @noname0310 in Inspector v2 to highlight the selected mesh. Currently I have it enabled by default, and it can be disabled from the settings pane or the picking toolbar. I'm slightly unsure about having it enabled by default since it can affect rendering performance. Open to opinions.\r\n\r\n<img width=\"1719\" height=\"613\" alt=\"image\" src=\"https://github.com/user-attachments/assets/a4e3dd80-7021-41fc-a2f0-519218f6f55e\" />\r\n\r\n- Add a setting for highlighting the selection.\r\n- Add a service that watches for selection change and uses `SelectionOutlineLayer` to outline/highlight the selected entity if possible (e.g. when it is an `AbstractMesh`).\r\n- Add a dropdown to the picking button in the toolbar that offers another way to enable/disable outlining/highlighting.\r\n- Add an `IThemeService` that exposes the low level theme with raw values (this is the layer below the `tokens`, which is a css layer and uses css vars), and use it in the new highlight service so the highlighting can take the theme into account.\r\n- Fix a small bug where our theme definition was using tokens (e.g. pushing the higher level css layer into the lower level raw theme layer).\r\n\r\nOne issue I'm seeing with this - when highlighting is enabled on a mesh, (e.g. `SelectionOutlineLayer` is active), `mesh.showBoundingBox` no longer works. @noname0310 any ideas on this one?",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/components/pickingToolbar.tsx",
+                    "packages/dev/inspector-v2/src/components/theme.tsx",
+                    "packages/dev/inspector-v2/src/inspector.tsx",
+                    "packages/dev/inspector-v2/src/modularTool.tsx",
+                    "packages/dev/inspector-v2/src/services/highlightService.ts",
+                    "packages/dev/inspector-v2/src/services/panes/settingsService.tsx",
+                    "packages/dev/inspector-v2/src/services/pickingService.tsx",
+                    "packages/dev/inspector-v2/src/services/settingsContext.ts",
+                    "packages/dev/inspector-v2/src/services/themeService.ts",
+                    "packages/dev/inspector-v2/src/themes/babylonTheme.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17862",
+                "title": "Visual tests for emitters",
+                "description": "Adds visual tests for the different emitter shapes for particle systems.",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-box.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-cone.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-custom.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-cylinder.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-directed-cone.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-directed-cylinder.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-directed-sphere.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-hemisphere.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-mesh.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-point.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-emitters-sphere.png",
+                    "packages/tools/tests/test/visualization/config.json"
+                ],
+                "tags": [
+                    "particles",
+                    "tests"
+                ]
+            }
+        ],
+        "8.50.3": [
+            {
+                "pr": "17867",
+                "title": "WebGPU: Fix wrong render target state when not using frame graphs",
+                "description": "See https://forum.babylonjs.com/t/viewer-shadows-glitching/62379",
+                "author": {
+                    "name": "Popov72",
+                    "url": "https://github.com/Popov72"
+                },
+                "files": [
+                    "packages/dev/core/src/Engines/abstractEngine.ts",
+                    "packages/dev/core/src/Engines/webgpuEngine.ts",
+                    "packages/dev/core/src/FrameGraph/frameGraphContext.ts",
+                    "packages/dev/core/src/FrameGraph/frameGraphRenderContext.ts",
+                    "packages/dev/core/src/Lights/Shadows/cascadedShadowGenerator.ts",
+                    "packages/dev/core/src/Lights/Shadows/shadowGenerator.ts",
+                    "packages/dev/core/src/Lights/lightingVolume.ts",
+                    "packages/dev/core/src/Materials/Textures/Procedurals/proceduralTexture.ts",
+                    "packages/dev/core/src/Probes/reflectionProbe.ts",
+                    "packages/dev/core/src/Rendering/depthRenderer.ts"
+                ],
+                "tags": [
+                    "bug",
+                    "WebGPU"
+                ]
+            },
+            {
+                "pr": "17820",
+                "title": "Yaw East +90, West -90. Add pointer sensitivity",
+                "description": "+90 being east is more intuitive and matches the behavior before moving to quaternion rotation.  Added unit tests to verify\r\n\r\nAlso added \r\n- pointerinput pitch/yaw sensitivity to allow more finegrained control of speed \r\n- geospatialcamera classname\r\n- moved pitchToPan limit to be part of the pointer input class vs on limits class\r\n- added serialize tags to camera\r\n\r\ntested with /#VQDXMU",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/core/src/Cameras/Inputs/geospatialCameraPointersInput.ts",
+                    "packages/dev/core/src/Cameras/Limits/geospatialLimits.ts",
+                    "packages/dev/core/src/Cameras/geospatialCamera.ts",
+                    "packages/dev/core/test/unit/Cameras/geospatialCamera.test.ts",
+                    "packages/dev/inspector-v2/src/components/properties/cameras/geospatialCameraProperties.tsx"
+                ],
+                "tags": [
+                    "camera"
+                ]
+            },
+            {
+                "pr": "17865",
+                "title": "Add .webp which is already supported to inspector v2 material textures",
+                "description": "These file formats are already supported by the inspector, just that they won't show when uploading (unless explicitly changing to show all files in the OS file picker).",
+                "author": {
+                    "name": "ricardovg4",
+                    "url": "https://github.com/ricardovg4"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/components/properties/materials/openpbrMaterialProperties.tsx"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17868",
+                "title": "Remove experimental flag from floatingorigin feature",
+                "description": null,
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/core/src/Engines/abstractEngine.ts",
+                    "packages/dev/core/src/scene.ts"
+                ],
+                "tags": [
+                    "skip changelog"
+                ]
+            },
+            {
+                "pr": "17815",
+                "title": "Havok FloatingOrigin Multi-Region Support",
+                "description": "To avoid floatingPointImprecision when sending position information to havok, we want to offset the physics body position by some value before sending to havok, then remove the offset when retrieving the positions. \r\n\r\nHowever we can't reliably use camera position as the single floatingOriginOffset value because if the camera changes to a far away location and we create a new physics body, those objects won't properly collide/interact because they will be offset by different amounts.\r\n\r\nTo prevent this, we are creating multiple regions, each with their own center and a predefined radius. Within a given region, all bodies will have the same offset and can interact with one another. If a body is created and there isnt an existing world region in its vicinity (i.e. we get far enough from any existing regions' center), we will create a new region.\r\n\r\nThis means that bodies within different regions cannot collide. This is a limitation of the system. User can change the radius to be larger if need be. \r\n\r\nAnother limitation is that the physicsaggregate must be created after the object is positioned in order for it to be placed in the proper region. \r\n\r\nIn future we can add support to dynamically move an object into a different region as need arises.\r\n\r\ntested in playground with multi-viewport and fixed timestep [/#7N17MT#13 ](https://playground.babylonjs.com/?snapshot=refs/pull/17815/merge#7N17MT#13) \r\n#KJ0945#9\r\n#TOVMEA#7\r\n#RQIZD3#102 \r\n#MZCQC4#97\r\n#JVZAFL#18\r\n\r\n#17451 \r\n",
+                "author": {
+                    "name": "georginahalpern",
+                    "url": "https://github.com/georginahalpern"
+                },
+                "files": [
+                    "packages/dev/core/src/Physics/v2/Plugins/havokPlugin.ts",
+                    "packages/dev/core/src/scene.ts",
+                    "packages/tools/tests/test/visualization/ReferenceImages/Havok-FloatingOrigin-Multi-Region.png",
+                    "packages/tools/tests/test/visualization/config.json"
+                ],
+                "tags": [
+                    "physics",
+                    "new feature"
+                ]
+            },
+            {
+                "pr": "17863",
+                "title": "Fix Bounding Box Renderer did not work when EffectLayer was enabled",
+                "description": "Once this PR is merged, the next PG should appear as shown in the image.\r\n\r\nhttps://playground.babylonjs.com/#LA850M#36\r\n<img width=\"976\" height=\"1018\" alt=\"image\" src=\"https://github.com/user-attachments/assets/98ebf819-e25b-48be-9b8b-b6a10b99d146\" />\r\n\r\n\r\nFixes the issue mentioned in #17861 where the BoundingBoxRenderer does not work when an Effect Layer is enabled.\r\n\r\nThe root cause is as follows:\r\n\r\nEffect Layer renders the Scene to a render target through an ObjectRenderer in the _cameraDrawRenderTargetStage. During this process, the ObjectRenderer calls _beforeEvaluateActiveMeshStage, which clears the BoundingBoxRenderer's renderList.\r\n\r\nIn fact, the same issue also occurs when rendering render targets, and there is already evidence that it has been addressed.\r\n\r\nIf you look at the code right above the code I modified, you can see that after collecting the render targets and performing the rendering, it saves the BoundingBoxRenderer's renderList and then restores it afterward.\r\n\r\n```typescript\r\nconst boundingBoxRenderer = (this as any).getBoundingBoxRenderer?.() as Nullable<BoundingBoxRenderer>;\r\n\r\nlet currentBoundingBoxMeshList: Array<BoundingBox> | undefined;\r\n\r\nfor (let renderIndex = 0; renderIndex < this._renderTargets.length; renderIndex++) {\r\n    const renderTarget = this._renderTargets.data[renderIndex];\r\n    if (renderTarget._shouldRender()) {\r\n        this._renderId++;\r\n        const hasSpecialRenderTargetCamera = renderTarget.activeCamera && renderTarget.activeCamera !== this.activeCamera;\r\n        if (boundingBoxRenderer && !currentBoundingBoxMeshList) {\r\n            // Saves the current bounding box mesh list (potentially built by the call to _evaluateActiveMeshes above), which will be reset/updated when processing this target\r\n            currentBoundingBoxMeshList = boundingBoxRenderer.renderList.length > 0 ? boundingBoxRenderer.renderList.data.slice() : [];\r\n            currentBoundingBoxMeshList.length = boundingBoxRenderer.renderList.length;\r\n        }\r\n        renderTarget.render(<boolean>hasSpecialRenderTargetCamera, this.dumpNextRenderTargets);\r\n        needRebind = true;\r\n    }\r\n}\r\nif (boundingBoxRenderer && currentBoundingBoxMeshList) {\r\n    boundingBoxRenderer.renderList.data = currentBoundingBoxMeshList;\r\n    boundingBoxRenderer.renderList.length = currentBoundingBoxMeshList.length;\r\n}\r\n```\r\n\r\nTherefore, I applied the same approach and modified the code so that the renderList is restored even after the Effect Layer's ObjectRenderer has executed.",
+                "author": {
+                    "name": "noname0310",
+                    "url": "https://github.com/noname0310"
+                },
+                "files": [
+                    "packages/dev/core/src/scene.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17856",
+                "title": "Inspector: collapse/expand options",
+                "description": "Inspector: add leftPaneStartCollapsed, rightPaneStartCollapsed options; collapse/expand api\r\n\r\nAllows user to specify whether these panels start collapsed, for example on mobile\r\n\r\nAlso accounts for hiding expand icon when the panel has no panes",
+                "author": {
+                    "name": "marns",
+                    "url": "https://github.com/marns"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/inspector.tsx",
+                    "packages/dev/inspector-v2/src/services/shellService.tsx"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17860",
+                "title": "Inspector v2: Fix regression in hiding properties",
+                "description": "I accidentally introduced this regression in this change: https://github.com/BabylonJS/Babylon.js/pull/17837/changes#diff-32574963ca707d3b7e62b1335228d1e7ea3a9544fde6c98411bb7d4d3e55676dR245-R250\r\n\r\nThis added hooks for robustly observing keyboard state, but the hooks replaced event handlers that were *after* some early returns, which makes them conditional, which breaks \"the rule of hooks\" (breaks React internal state).\r\n\r\nThis fix just moves the hooks above the early returns.",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/dev/sharedUiComponents/src/fluent/primitives/accordion.tsx"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17846",
+                "title": "Add support for compound gsplat in Depth renderer",
+                "description": "Compound GaussianSplattingMesh were added lately, but they were not supported by the Depth renderer. This PR addresses this.",
+                "author": {
+                    "name": "eliemichel",
+                    "url": "https://github.com/eliemichel"
+                },
+                "files": [
+                    "packages/dev/core/src/Materials/GaussianSplatting/gaussianSplattingMaterial.ts",
+                    "packages/dev/core/src/Rendering/depthRenderer.ts",
+                    "packages/dev/core/src/Shaders/gaussianSplattingDepth.vertex.fx",
+                    "packages/dev/core/src/ShadersWGSL/gaussianSplattingDepth.vertex.fx"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17859",
+                "title": "Fix orthographic depth scale",
+                "description": null,
+                "author": {
+                    "name": "CedricGuillemet",
+                    "url": "https://github.com/CedricGuillemet"
+                },
+                "files": [
+                    "packages/dev/core/src/Meshes/GaussianSplatting/gaussianSplattingMesh.ts"
+                ],
+                "tags": [
+                    "skip changelog"
+                ]
+            },
+            {
+                "pr": "17854",
+                "title": "More WGSL conversion for atmosphere",
+                "description": null,
+                "author": {
+                    "name": "kircher1",
+                    "url": "https://github.com/kircher1"
+                },
+                "files": [
+                    "packages/dev/addons/src/atmosphere/ShadersWGSL/ShadersInclude/depthFunctions.fx",
+                    "packages/dev/addons/src/atmosphere/ShadersWGSL/compositeAerialPerspective.fragment.fx",
+                    "packages/dev/addons/src/atmosphere/atmosphere.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17851",
+                "title": "New particles tests for gradients",
+                "description": "This adds visual tests for regular and node particles for properties that can be updated with gradients: size, color, speed, speed limit, angular speed, drag, emit rate, lifetime, start size.",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-angular-speed-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-angular-speed.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-color-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-color.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-drag-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-drag.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-emit-rate-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-emit-rate.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-lifetime-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-lifetime.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-size-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-size.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-speed-2.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-speed-limit.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-speed.png",
+                    "packages/tools/tests/test/visualization/ReferenceImages/particles-basic-change-start-size.png",
+                    "packages/tools/tests/test/visualization/config.json"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17852",
+                "title": "Trying a different Monaco fix",
+                "description": "This is an attempt to fix the issue with a regex in the latest Monaco that doesn't work in old Safari versions. The original fix works locally but hangs the CI. This fix also works locally, running this PR to see the CI results.\r\n\r\nStill missing testing in an old Safari device.\r\n\r\nOriginal work from @simonedevit and @knervous ",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/playground/src/custom.d.ts",
+                    "packages/tools/playground/src/tools/monaco/compat/defaultDocumentColorsComputer.ts",
+                    "packages/tools/playground/webpack.config.js"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17853",
+                "title": "More WGSL conversion for atmosphere",
+                "description": null,
+                "author": {
+                    "name": "kircher1",
+                    "url": "https://github.com/kircher1"
+                },
+                "files": [
+                    "packages/dev/addons/src/atmosphere/Shaders/ShadersInclude/depthFunctions.fx",
+                    "packages/dev/addons/src/atmosphere/ShadersWGSL/ShadersInclude/depthFunctions.fx",
+                    "packages/dev/addons/src/atmosphere/ShadersWGSL/compositeGlobeAtmosphere.fragment.fx",
+                    "packages/dev/addons/src/atmosphere/atmosphere.ts"
+                ],
+                "tags": []
+            }
+        ],
+        "8.50.2": [
+            {
+                "pr": "17850",
+                "title": "Fix an issue with static in old versions",
+                "description": "Details here:\r\n\r\nhttps://github.com/BabylonJS/Babylon.js/pull/17750\r\n\r\nThis only fixes one of the issues: untranspiled es2022+ syntax\r\nstatic syntax -> Add transpile target to webpack for monaco-editor",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/tools/playground/webpack.config.js"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17847",
+                "title": "ensure joint tracking spheres are created in same scene as the XR session",
+                "description": "Fix for https://forum.babylonjs.com/t/handconstraintbehavior-not-updating-position-to-follow-hand-tracking/62370",
+                "author": {
+                    "name": "wmurphyrd",
+                    "url": "https://github.com/wmurphyrd"
+                },
+                "files": [
+                    "packages/dev/core/src/XR/features/WebXRHandTracking.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17849",
+                "title": "Fixed issue with animation rendering at small sizes",
+                "description": "There was a problem when calculating the sprites position at small sizes because I was mixing the atlas scale and the canvas scale. Separated the two values so they are applied correctly.",
+                "author": {
+                    "name": "VicenteCartas",
+                    "url": "https://github.com/VicenteCartas"
+                },
+                "files": [
+                    "packages/dev/lottiePlayer/src/localPlayer.ts",
+                    "packages/dev/lottiePlayer/src/messageTypes.ts",
+                    "packages/dev/lottiePlayer/src/parsing/spritePacker.ts",
+                    "packages/dev/lottiePlayer/src/player.ts",
+                    "packages/dev/lottiePlayer/src/rendering/animationController.ts",
+                    "packages/dev/lottiePlayer/src/rendering/calculateScaleFactor.ts",
+                    "packages/dev/lottiePlayer/src/worker.ts",
+                    "packages/tools/devHost/src/lottie/main.ts"
+                ],
+                "tags": []
+            },
+            {
+                "pr": "17843",
+                "title": "Inspector v2: Scene explorer hotkeys + delete to dispose",
+                "description": "This PR addresses two pieces of user feedback - hotkeys (keyboard shortcuts) for scene explorer commands (internal feedback), and a scene explorer command for \"deleting\" any disposable entity (https://forum.babylonjs.com/t/introducing-inspector-v2/60937/60). The delete/dispose command was added as a context menu command so it doesn't take up space on most tree view items, and is bound to the `Delete` key.\r\n\r\n- Add support for scene explorer command hotkeys\r\n- Add a new dispose/delete command\r\n- Bind the dispose/delete command to the delete key\r\n- Bind a couple other primary toggle commands to ctrl+space (visibility, animation play/pause)\r\n\r\nWe can add keyboard bindings for more commands in future changes.",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/components/scene/sceneExplorer.tsx",
+                    "packages/dev/inspector-v2/src/inspector.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/animationGroupExplorerService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/defaultSectionsMetadata.ts",
+                    "packages/dev/inspector-v2/src/services/panes/scene/disposableCommandService.tsx",
+                    "packages/dev/inspector-v2/src/services/panes/scene/nodeExplorerService.tsx"
+                ],
+                "tags": [
+                    "inspector"
+                ]
+            },
+            {
+                "pr": "17845",
+                "title": "Inspector v2: Blur event resets key state to avoid 'stuck' keys",
+                "description": "In this previous PR #17837, I introduced custom hooks for watching keyboard state. I missed watching for the `blur` event though (window/document loses focus), which can result in keys being \"stuck\" in a pressed state. That is, the key is pressed, then the window/document loses focus (blur), and then the key is released. Previously we didn't see the key up event, and so the key was stuck in pressed state. This PR fixes this issue.\r\n\r\n- Factor out a `useEventListener` hook that will watch the current, primary, or both windows/documents.\r\n- Use `useEventListener` in `useKeyListener`.\r\n- Use `useEventListener` in `useKeyState` to also watch for the `blur` event.",
+                "author": {
+                    "name": "ryantrem",
+                    "url": "https://github.com/ryantrem"
+                },
+                "files": [
+                    "packages/dev/inspector-v2/src/index.ts",
+                    "packages/dev/sharedUiComponents/src/fluent/hooks/eventHooks.ts",
+                    "packages/dev/sharedUiComponents/src/fluent/hooks/keyboardHooks.ts"
+                ],
+                "tags": [
+                    "bug",
+                    "inspector"
+                ]
+            }
+        ],
         "8.50.1": [
             {
                 "pr": "17844",
@@ -438,6 +1607,7 @@
                 "tags": []
             }
         ],
+        "8.50.0": [],
         "8.49.7": [
             {
                 "pr": "17823",

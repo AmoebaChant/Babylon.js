@@ -16,6 +16,7 @@ import { DeepCopier } from "../Misc/deepCopier";
 import type { IInspectable } from "../Misc/iInspectable";
 import type { IAnimatable } from "../Animations/animatable.interface";
 import type { IAssetContainer } from "core/IAssetContainer";
+import type { TransformNode } from "core/Meshes/transformNode";
 
 /**
  * Class used to handle skinning animations
@@ -259,6 +260,34 @@ export class Skeleton implements IAnimatable {
             }
         }
         return -1;
+    }
+
+    /**
+     * Finds a bone in a skeleton that is linked to the given transform node.
+     * @param transformNode The transform node to find the bone for
+     * @returns The bone linked to the transform node, or null if not found
+     */
+    public findBoneFromLinkedTransformNode(transformNode: TransformNode) {
+        for (const bone of this.bones) {
+            if (bone._linkedTransformNode === transformNode) {
+                return bone;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds a bone in a skeleton by the name of its linked transform node.
+     * @param name The name of the linked transform node
+     * @returns The bone linked to the transform node with the given name, or null if not found
+     */
+    public findBoneFromLinkedTransformNodeName(name: string) {
+        for (const bone of this.bones) {
+            if (bone._linkedTransformNode && bone._linkedTransformNode.name === name) {
+                return bone;
+            }
+        }
+        return null;
     }
 
     /**

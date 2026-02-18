@@ -8,7 +8,7 @@ import { VertexData } from "../mesh.vertexData";
 import { Matrix, TmpVectors, Vector2, Vector3 } from "core/Maths/math.vector";
 import { Quaternion } from "core/Maths/math.vector";
 import { Logger } from "core/Misc/logger";
-import { GaussianSplattingMaterial } from "core/Materials/GaussianSplatting/gaussianSplattingMaterial";
+import { GaussianSplattingMaterial, GaussianSplattingMaxPartCount } from "core/Materials/GaussianSplatting/gaussianSplattingMaterial";
 import { RawTexture } from "core/Materials/Textures/rawTexture";
 import { Constants } from "core/Engines/constants";
 import "core/Meshes/thinInstanceMesh";
@@ -18,7 +18,7 @@ import type { Material } from "core/Materials/material";
 import { Scalar } from "core/Maths/math.scalar";
 import { runCoroutineSync, runCoroutineAsync, createYieldingScheduler, type Coroutine } from "core/Misc/coroutine";
 import { EngineStore } from "core/Engines/engineStore";
-import type { Camera } from "core/Cameras/camera";
+import { Camera } from "core/Cameras/camera";
 import { ImportMeshAsync } from "core/Loading/sceneLoader";
 import type { INative } from "core/Engines/Native/nativeInterfaces";
 import { GaussianSplattingPartProxyMesh } from "./gaussianSplattingPartProxyMesh";
@@ -28,7 +28,6 @@ declare const _native: INative;
 
 const IsNative = typeof _native !== "undefined";
 const Native = IsNative ? _native : null;
-
 interface IDelayedTextureUpdate {
     covA: Uint16Array;
     covB: Uint16Array;
@@ -701,6 +700,7 @@ export class GaussianSplattingMesh extends Mesh {
                                 viewProjection: this._viewProjectionMatrix.m,
                                 depthMix: this._depthMix,
                                 cameraId: camera.uniqueId,
+                                depthScale: camera.mode === Camera.ORTHOGRAPHIC_CAMERA ? (camera.maxZ - camera.minZ) / 2.0 : 1.0,
                             },
                             [this._depthMix.buffer]
                         );
@@ -754,7 +754,23 @@ export class GaussianSplattingMesh extends Mesh {
         }
         const mesh = cameraViewInfos.mesh;
         mesh.getWorldMatrix().copyFrom(this.getWorldMatrix());
+
+        // Propagate render pass material overrides (e.g., GPU picking) to the inner camera mesh.
+        // When this mesh is rendered into a RenderTargetTexture with a material override (via setMaterialForRendering),
+        // the override is set on this proxy mesh but needs to be applied to the actual camera mesh that does the rendering.
+        const engine = this._scene.getEngine();
+        const renderPassId = engine.currentRenderPassId;
+        const renderPassMaterial = this.getMaterialForRenderPass(renderPassId);
+        if (renderPassMaterial) {
+            mesh.setMaterialForRenderPass(renderPassId, renderPassMaterial);
+        }
+
         const ret = mesh.render(subMesh, enableAlphaMode, effectiveMeshReplacement);
+
+        // Clean up the temporary override to avoid affecting other render passes
+        if (renderPassMaterial) {
+            mesh.setMaterialForRenderPass(renderPassId, undefined);
+        }
 
         if (this.onAfterRenderObservable) {
             this.onAfterRenderObservable.notifyObservers(this);
@@ -1599,10 +1615,7 @@ export class GaussianSplattingMesh extends Mesh {
                     indices[2 * j] = j;
                 }
 
-                let depthFactor = -1;
-                if (e.data.useRightHandedSystem) {
-                    depthFactor = 1;
-                }
+                const depthScale = e.data.depthScale;
 
                 if (partMatrices && partIndices) {
                     // If there are rig node matrices, we use them instead of the global model view proj
@@ -1616,13 +1629,13 @@ export class GaussianSplattingMesh extends Mesh {
                         // NB: We need this 'min' because vertex array is padded, not partIndices
                         const partIndex = partIndices[Math.min(j, length - 1)];
                         const mvp = modelViewProjs[partIndex];
-                        floatMix[2 * j + 1] = 10000 + (mvp[2] * positions[4 * j + 0] + mvp[6] * positions[4 * j + 1] + mvp[10] * positions[4 * j + 2] + mvp[14]) * depthFactor;
+                        floatMix[2 * j + 1] = 10000 - (mvp[2] * positions[4 * j + 0] + mvp[6] * positions[4 * j + 1] + mvp[10] * positions[4 * j + 2] + mvp[14]) * depthScale;
                     }
                 } else {
                     // If there are no rig node matrices, we use the global model view proj
                     const mvp = globalModelViewProjection;
                     for (let j = 0; j < vertexCountPadded; j++) {
-                        floatMix[2 * j + 1] = 10000 + (mvp[2] * positions[4 * j + 0] + mvp[6] * positions[4 * j + 1] + mvp[10] * positions[4 * j + 2] + mvp[14]) * depthFactor;
+                        floatMix[2 * j + 1] = 10000 - (mvp[2] * positions[4 * j + 0] + mvp[6] * positions[4 * j + 1] + mvp[10] * positions[4 * j + 2] + mvp[14]) * depthScale;
                     }
                 }
 
@@ -2217,6 +2230,10 @@ export class GaussianSplattingMesh extends Mesh {
      * @returns a placeholder mesh that can be used to manipulate the part transform
      */
     public addPart(other: GaussianSplattingMesh, disposeOther: boolean = true): Mesh {
+        if (this.partCount >= GaussianSplattingMaxPartCount) {
+            throw new Error(`Cannot add part, as the maximum part count (${GaussianSplattingMaxPartCount}) has been reached`);
+        }
+
         const splatCountA = this._vertexCount;
         const splatsDataA = splatCountA == 0 ? new ArrayBuffer(0) : this.splatsData;
         const shDataA = this.shData;

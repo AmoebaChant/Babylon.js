@@ -62,10 +62,12 @@ import { GLTFAnimationImportServiceDefinition } from "./services/panes/tools/imp
 import { GLTFLoaderOptionsServiceDefinition } from "./services/panes/tools/import/gltfLoaderOptionsService";
 import { GLTFValidationServiceDefinition } from "./services/panes/tools/import/gltfValidationService";
 import { ToolsServiceDefinition } from "./services/panes/toolsService";
+import { HighlightServiceDefinition } from "./services/highlightService";
 import { PickingServiceDefinition } from "./services/pickingService";
 import { SceneContextIdentity } from "./services/sceneContext";
 import { SelectionServiceDefinition } from "./services/selectionService";
 import { ShellServiceIdentity } from "./services/shellService";
+import { ShellSettingsServiceDefinition } from "./services/shellSettingsService";
 import { TextureEditorServiceDefinition } from "./services/textureEditor/textureEditorService";
 import { UserFeedbackServiceDefinition } from "./services/userFeedbackService";
 
@@ -338,6 +340,7 @@ export function ShowInspector(scene: Scene, options: Partial<InspectorOptions> =
 
             // Settings pane tab and related services.
             SettingsServiceDefinition,
+            ShellSettingsServiceDefinition,
 
             // Tracks entity selection state (e.g. which Mesh or Material or other entity is currently selected in scene explorer and bound to the properties pane, etc.).
             SelectionServiceDefinition,
@@ -347,6 +350,9 @@ export function ShowInspector(scene: Scene, options: Partial<InspectorOptions> =
 
             // Allows picking objects from the scene to select them.
             PickingServiceDefinition,
+
+            // Highlights the selected mesh in the scene.
+            HighlightServiceDefinition,
 
             // Adds entry points for user feedback on Inspector v2 (probably eventually will be removed).
             UserFeedbackServiceDefinition,
@@ -359,6 +365,7 @@ export function ShowInspector(scene: Scene, options: Partial<InspectorOptions> =
         );
 
         const modularTool = MakeModularTool({
+            namespace: "Inspector",
             containerElement,
             serviceDefinitions: [
                 // Default Inspector services.
@@ -372,6 +379,8 @@ export function ShowInspector(scene: Scene, options: Partial<InspectorOptions> =
             extensionFeeds: [DefaultInspectorExtensionFeed, ...(options.extensionFeeds ?? [])],
             toolbarMode: "compact",
             sidePaneRemapper: options.sidePaneRemapper,
+            leftPaneDefaultCollapsed: options.leftPaneDefaultCollapsed,
+            rightPaneDefaultCollapsed: options.rightPaneDefaultCollapsed,
         });
         disposeActions.push(() => modularTool.dispose());
 

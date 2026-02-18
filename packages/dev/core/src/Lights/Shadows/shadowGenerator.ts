@@ -915,8 +915,7 @@ export class ShadowGenerator implements IShadowGenerator {
         this._useUBO = this._scene.getEngine().supportsUniformBuffers;
 
         if (this._useUBO) {
-            this._sceneUBOs = [];
-            this._sceneUBOs.push(this._scene.createSceneUniformBuffer(`Scene for Shadow Generator (light "${this._light.name}")`));
+            this._sceneUBOs = [this._scene.createSceneUniformBuffer(`Scene for Shadow Generator (light "${this._light.name}")`, { forceMono: true })];
         }
 
         ShadowGenerator._SceneComponentInitialization(this._scene);
@@ -1049,7 +1048,7 @@ export class ShadowGenerator implements IShadowGenerator {
         this._shadowMap.onBeforeBindObservable.add(() => {
             this._currentSceneUBO = this._scene.getSceneUniformBuffer();
             if (engine._enableGPUDebugMarkers) {
-                engine.restoreDefaultFramebuffer();
+                engine.restoreDefaultFramebuffer(true);
                 engine._debugPushGroup?.(`Shadow map generation for pass id ${engine.currentRenderPassId}`);
             }
         });
@@ -1066,7 +1065,7 @@ export class ShadowGenerator implements IShadowGenerator {
             this.getTransformMatrix(); // generate the view/projection matrix
             FloatingOriginCurrentScene.eyeAtCamera = false;
             this._scene.setTransformMatrix(this._viewMatrix, this._projectionMatrix);
-            if (this._useUBO) {
+            if (this._sceneUBOs) {
                 this._scene.getSceneUniformBuffer().unbindEffect();
                 this._scene.finalizeSceneUbo();
             }
